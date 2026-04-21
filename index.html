@@ -618,15 +618,17 @@ async function callAPI() {
 
   try {
     // GASを経由してClaude APIを呼び出す
+    // ※ GASのCORS制限回避のためContent-Typeをtext/plainに設定
     const response = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
         action: 'chat',
         origin: window.location.origin,
         system: SYSTEM_PROMPT,
         messages: conversationHistory
-      })
+      }),
+      redirect: 'follow'
     });
 
     const result = await response.json();
@@ -861,8 +863,9 @@ async function sendToGAS() {
     const logData = buildLogData();
     const response = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'log', origin: window.location.origin, logData: logData })
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'log', origin: window.location.origin, logData: logData }),
+      redirect: 'follow'
     });
 
     const result = await response.json();
