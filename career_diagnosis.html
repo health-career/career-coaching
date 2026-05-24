@@ -877,27 +877,57 @@ function savePDF() {
   switchSumTab('ai');
 }
 
-function submitToGoogleForm() {
+async function submitToGoogleForm() {
   const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = '送信中...';
+  btn.disabled = true;
+  btn.textContent = '送信中...';
 
   const aiSummary = localStorage.getItem('cd_ai_summary') || '（サマリーなし）';
   const rawText = buildRawText();
+  const accessCode = localStorage.getItem('cd_access_code') || '不明';
 
-  if (GOOGLE_FORM_URL === 'YOUR_GOOGLE_FORM_URL_HERE') {
-    setTimeout(() => showComplete(), 1200);
-    return;
+  // ① GASスプレッドシートにログ記録
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'log',
+        origin: window.location.origin,
+        token: SECRET_TOKEN,
+        logData: {
+          accessCode: accessCode,
+          aiSummary: aiSummary,
+          rawData: rawText
+        }
+      }),
+      redirect: 'follow'
+    });
+  } catch(e) {
+    console.warn('GASログ記録に失敗しました:', e.message);
   }
 
-  const params = new URLSearchParams();
-  params.set(FORM_ENTRY_AI, aiSummary);
-  params.set(FORM_ENTRY_RAW, rawText);
-  const submitUrl = GOOGLE_FORM_URL.replace('/viewform', '/formResponse') + '?' + params.toString();
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = submitUrl;
-  document.body.appendChild(iframe);
-  setTimeout(() => showComplete(), 1500);
+  // ② Googleフォームに送信（新しいタブで開いて自動送信）
+  if (GOOGLE_FORM_URL !== 'YOUR_GOOGLE_FORM_URL_HERE') {
+    try {
+      const params = new URLSearchParams();
+      params.set(FORM_ENTRY_AI, aiSummary);
+      params.set(FORM_ENTRY_RAW, rawText);
+      const submitUrl = GOOGLE_FORM_URL.replace('/viewform', '/formResponse') + '?' + params.toString();
+
+      // fetchで送信（no-corsモード）
+      await fetch(submitUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString()
+      });
+    } catch(e) {
+      console.warn('Googleフォーム送信に失敗しました:', e.message);
+    }
+  }
+
+  showComplete();
 }
 
 function showComplete() {
