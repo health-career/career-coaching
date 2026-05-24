@@ -263,17 +263,50 @@ body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;jus
       </div>
       <div style="height:20px;"></div>
       <div class="submit-note">上記の内容を担当のキャリアコンサルタントに送信します。氏名等の個人情報は含まれません。送信後の内容はアプリ側に保存されません。</div>
-      <div class="btn-row">
-        <button class="btn-ghost" onclick="copySummary()">AIサマリーをコピー</button>
-        <button class="btn-ghost orange" onclick="savePDF()">📄 PDFとして保存</button>
-        <button class="btn-submit" id="submitBtn" onclick="submitToGoogleForm()">担当者に提出する →</button>
+      <div class="btn-row" style="justify-content:space-between;">
+        <button class="btn-ghost" onclick="backToForm()" style="color:var(--tmuted);">← フォームに戻る</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+          <button class="btn-ghost" onclick="copySummary()">AIサマリーをコピー</button>
+          <button class="btn-ghost orange" onclick="savePDF()">📄 PDFとして保存</button>
+          <button class="btn-submit" id="submitBtn" onclick="submitToGoogleForm()">担当者に提出する →</button>
+        </div>
       </div>
     </div>
     <div style="display:none;" id="complete-wrap">
       <div class="complete-wrap">
         <div class="complete-icon">✅</div>
         <div class="complete-title">提出が完了しました</div>
-        <div class="complete-sub">担当のキャリアコンサルタントに内容が送信されました。<br>面談当日にお会いできることを楽しみにしています。<br><br>このページは閉じていただいて構いません。</div>
+        <div class="complete-sub">担当のキャリアコンサルタントに内容が送信されました。<br>面談当日にお会いできることを楽しみにしています。</div>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:24px;flex-wrap:wrap;">
+          <button class="btn-ghost orange" onclick="savePDFFromComplete()">📄 PDFとして保存</button>
+          <button class="btn-ghost" onclick="showResultScreen()">診断結果を確認する</button>
+        </div>
+        <div style="font-size:11px;color:var(--tmuted);margin-top:14px;line-height:1.6;">※ 結果確認は同じブラウザ・同じデバイスからのみ可能です</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       画面4: 結果確認画面
+  ====================================================== -->
+  <div class="screen" id="screen-result">
+    <div class="cf-body">
+      <div class="sum-tabs">
+        <div class="sum-tab active" onclick="switchResultTab('ai')">AIサマリー</div>
+        <div class="sum-tab" onclick="switchResultTab('raw')">フォーム入力内容</div>
+      </div>
+      <div class="sum-panel show" id="result-panel-ai">
+        <div class="ai-summary-box" id="result-summary-text">（読み込み中...）</div>
+      </div>
+      <div class="sum-panel" id="result-panel-raw">
+        <div id="result-raw-area"></div>
+      </div>
+      <div style="height:16px;"></div>
+      <div style="font-size:11.5px;color:var(--tmuted);padding:8px 12px;background:rgba(232,149,109,0.06);border-radius:8px;border-left:2px solid rgba(232,149,109,0.3);margin-bottom:16px;line-height:1.7;">
+        ※ この結果は同じブラウザ・同じデバイスからのみ確認できます。ブラウザのデータを消去すると閲覧できなくなります。
+      </div>
+      <div class="btn-row">
+        <button class="btn-ghost orange" onclick="savePDFFromResult()">📄 PDFとして保存</button>
       </div>
     </div>
   </div>
@@ -429,6 +462,7 @@ async function verifyCode() {
     const result = await res.json();
     if (result.success && result.valid) {
       localStorage.setItem('cd_access_code', code);
+      localStorage.setItem('cd_verified', '1');
       startForm();
     } else {
       errEl.textContent = result.message || 'コードが無効か、有効期限が切れています。';
@@ -437,6 +471,7 @@ async function verifyCode() {
     // GAS未設定時はデモ動作
     if (code.length >= 4) {
       localStorage.setItem('cd_access_code', code);
+      localStorage.setItem('cd_verified', '1');
       startForm();
     } else {
       errEl.textContent = 'コードが短すぎます。担当者に確認してください。';
@@ -869,6 +904,57 @@ function showComplete() {
   document.getElementById('submit-body').style.display = 'none';
   document.getElementById('complete-wrap').style.display = 'block';
   updateProgress(100, '完了');
+  // 完了フラグをローカルストレージに保存
+  localStorage.setItem('cd_completed', '1');
+}
+
+function backToForm() {
+  showScreen('form');
+  renderForm();
+}
+
+function savePDFFromComplete() {
+  // AIサマリーのみ印刷
+  const summaryText = localStorage.getItem('cd_ai_summary') || '';
+  const win = window.open('', '_blank');
+  win.document.write('<html><head><title>AIキャリア診断 サマリー</title><style>body{font-family:sans-serif;padding:24px;font-size:13px;line-height:1.9;color:#2C1A0E;white-space:pre-wrap;}</style></head><body>' + summaryText.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</body></html>');
+  win.document.close();
+  win.print();
+}
+
+function switchResultTab(name) {
+  document.querySelectorAll('#screen-result .sum-tab').forEach((t, i) => {
+    t.classList.toggle('active', ['ai','raw'][i] === name);
+  });
+  document.getElementById('result-panel-ai').classList.toggle('show', name === 'ai');
+  document.getElementById('result-panel-raw').classList.toggle('show', name === 'raw');
+
+  if (name === 'raw') {
+    const area = document.getElementById('result-raw-area');
+    if (!area.innerHTML) {
+      let html = '';
+      SECTIONS.forEach((s, si) => {
+        html += '<div class="raw-section"><div class="raw-section-title">' + esc(s.label) + '</div>';
+        const saved = JSON.parse(localStorage.getItem('cf_answers') || '{}');
+        const sec = saved[si] || {};
+        s.questions.forEach((q, qi) => {
+          const v = sec[qi];
+          const hasVal = v && String(v).trim();
+          html += '<div class="raw-item"><div class="raw-q">' + esc(q.t) + '</div>';
+          html += '<div class="raw-a">' + (hasVal ? esc(String(v)) : '<span class="raw-empty">未入力</span>') + '</div></div>';
+        });
+        html += '</div>';
+      });
+      area.innerHTML = html;
+    }
+  }
+}
+
+function savePDFFromResult() {
+  document.getElementById('result-panel-ai').classList.add('show');
+  document.getElementById('result-panel-raw').classList.add('show');
+  window.print();
+  switchResultTab('ai');
 }
 
 // ============================================================
@@ -882,6 +968,50 @@ function updateProgress(pct, label) {
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// 初期化：認証済みチェック・結果確認画面
+// ============================================================
+window.onload = () => {
+  // フォームバージョン管理：バージョンが変わったら保存データをリセット
+  const FORM_VERSION = '1.0';
+  const savedVersion = localStorage.getItem('cf_form_version');
+  if (savedVersion !== FORM_VERSION) {
+    localStorage.removeItem('cf_answers');
+    localStorage.removeItem('cf_section');
+    localStorage.setItem('cf_form_version', FORM_VERSION);
+  }
+
+  // 認証済みブラウザはコード入力をスキップ
+  const verified = localStorage.getItem('cd_verified');
+  if (verified === '1') {
+    startForm();
+    return;
+  }
+
+  // 完了済みの場合は結果確認画面を表示
+  const aiSummary = localStorage.getItem('cd_ai_summary');
+  const completed = localStorage.getItem('cd_completed');
+  if (completed === '1' && aiSummary) {
+    showResultScreen();
+  }
+};
+
+// 結果確認画面を表示
+function showResultScreen() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-result').classList.add('active');
+  document.getElementById('prog-area').style.display = 'block';
+  document.getElementById('step-nav').style.display = 'none';
+  document.getElementById('header-step-label').textContent = '結果確認';
+  document.getElementById('header-sub').textContent = '提出済みの診断結果';
+  document.getElementById('pct-num').textContent = '100%';
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('pct-label').textContent = '完了';
+
+  const aiSummary = localStorage.getItem('cd_ai_summary') || '（サマリーが見つかりませんでした）';
+  document.getElementById('result-summary-text').textContent = aiSummary;
 }
 </script>
 </body>
