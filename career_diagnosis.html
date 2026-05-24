@@ -672,18 +672,10 @@ function parseMessage(text) {
 
 function formatBody(text) {
   const lines = text.split('\n');
-  let html = '', inList = false;
+  let html = '';
   lines.forEach(line => {
-    const lm = line.match(/^[①②③④⑤](.+)/);
-    if (lm) {
-      if (!inList) { html += '<ol>'; inList = true; }
-      html += '<li>' + esc(lm[1].trim()) + '</li>';
-    } else {
-      if (inList) { html += '</ol>'; inList = false; }
-      if (line.trim()) html += '<p>' + esc(line) + '</p>';
-    }
+    if (line.trim()) html += '<p>' + esc(line) + '</p>';
   });
-  if (inList) html += '</ol>';
   return html;
 }
 
