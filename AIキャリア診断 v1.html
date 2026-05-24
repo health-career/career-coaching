@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIキャリア診断</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@300;400;500;700&family=Shippori+Mincho:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;font-family:'Zen Kaku Gothic New',sans-serif;}
+
+/* ============================================================
+   CSS変数・共通
+============================================================ */
+.cf{
+  --cream:#FDFAF5;--o1:#E8956D;--o2:#D4785A;--ot:#7A3520;
+  --peach:#FDEBD0;--td:#2C1A0E;--tm:#6B4C3B;--tmuted:#A08878;
+  --bd:rgba(180,140,120,0.22);--surf:#fff;--green:#5A9268;--green2:#3D7050;
+  color:var(--td);background:var(--cream);border-radius:16px;
+  border:0.5px solid var(--bd);overflow:hidden;max-width:680px;width:100%;
+  box-shadow:0 4px 32px rgba(180,100,60,0.08);
+}
+
+/* ============================================================
+   ヘッダー・進捗・タブ（共通）
+============================================================ */
+.cf-header{background:linear-gradient(135deg,#FFF6ED 0%,#FDEBD0 40%,#FDF0E8 70%,#F0F9F5 100%);padding:18px 24px 14px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.cf-logo{font-family:'Shippori Mincho',serif;font-size:15px;font-weight:500;color:var(--o2);letter-spacing:0.1em;}
+.cf-logo-sub{font-size:10px;color:var(--tmuted);letter-spacing:0.05em;margin-top:2px;}
+.cf-prog-area{text-align:right;}
+.cf-pct{font-family:'Shippori Mincho',serif;font-size:22px;font-weight:600;color:var(--o1);}
+.cf-prog-lbl{font-size:10px;color:var(--tmuted);letter-spacing:0.06em;}
+.cf-prog-wrap{height:3px;background:rgba(180,140,120,0.15);margin-top:5px;width:110px;border-radius:2px;overflow:hidden;margin-left:auto;}
+.cf-prog-fill{height:100%;background:linear-gradient(90deg,var(--o1),var(--o2));border-radius:2px;transition:width 0.8s ease;}
+.cf-step-nav{display:flex;background:#FBF5EE;border-bottom:0.5px solid var(--bd);padding:0 24px;overflow-x:auto;gap:0;}
+.cf-step-nav::-webkit-scrollbar{height:0;}
+.cf-step-item{padding:11px 0;margin-right:20px;font-size:11px;color:var(--tmuted);letter-spacing:0.07em;border-bottom:2px solid transparent;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;}
+.cf-step-item.active{color:var(--o2);border-bottom-color:var(--o2);}
+.cf-step-item.done{color:var(--green);}
+.cf-step-num{width:17px;height:17px;border-radius:50%;background:rgba(180,140,120,0.2);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cf-step-item.active .cf-step-num{background:var(--o1);color:#fff;}
+.cf-step-item.done .cf-step-num{background:var(--green);color:#fff;font-size:9px;}
+
+/* ============================================================
+   画面切り替え
+============================================================ */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ============================================================
+   アクセスコード画面
+============================================================ */
+.access-wrap{background:linear-gradient(135deg,#FFF8F0 0%,#FDEBD0 35%,#FDEEE5 65%,#EEF8F2 100%);padding:48px 28px;text-align:center;}
+.access-icon{width:60px;height:60px;border-radius:50%;background:rgba(232,149,109,0.12);border:0.5px solid rgba(232,149,109,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:26px;}
+.access-title{font-family:'Shippori Mincho',serif;font-size:21px;font-weight:500;color:var(--td);margin-bottom:6px;letter-spacing:0.06em;}
+.access-sub{font-size:12.5px;color:var(--tmuted);line-height:1.8;margin-bottom:28px;}
+.access-input-row{display:flex;gap:8px;max-width:320px;margin:0 auto 14px;}
+.access-input{flex:1;background:#fff;border:0.5px solid var(--bd);border-radius:8px;padding:12px 16px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:15px;color:var(--td);text-align:center;letter-spacing:0.15em;outline:none;transition:border-color 0.2s;}
+.access-input:focus{border-color:var(--o1);}
+.access-err{font-size:12px;color:#C0392B;margin-top:8px;min-height:18px;}
+.access-note{font-size:11px;color:var(--tmuted);margin-top:14px;line-height:1.7;}
+
+/* ============================================================
+   Step1 フォーム
+============================================================ */
+.cf-body{padding:24px;}
+.cf-sec-title{font-family:'Shippori Mincho',serif;font-size:13px;font-weight:500;color:var(--o2);letter-spacing:0.1em;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.cf-sec-title::before{content:'';display:inline-block;width:3px;height:13px;background:linear-gradient(180deg,var(--o1),var(--o2));border-radius:2px;}
+.cf-sec-guide{font-size:11.5px;color:var(--tmuted);line-height:1.7;margin-bottom:18px;padding:8px 12px;background:rgba(232,149,109,0.07);border-radius:8px;}
+.cf-group{margin-bottom:18px;}
+.cf-label{display:block;font-size:12.5px;color:var(--tm);margin-bottom:6px;font-weight:500;letter-spacing:0.03em;line-height:1.65;}
+.cf-req{display:inline-block;font-size:9px;color:var(--o1);background:rgba(232,149,109,0.12);padding:1px 6px;border-radius:3px;margin-left:5px;vertical-align:middle;}
+.cf-opt{display:inline-block;font-size:9px;color:var(--tmuted);background:rgba(160,136,120,0.1);padding:1px 6px;border-radius:3px;margin-left:5px;vertical-align:middle;}
+.cf-note{font-size:11px;color:var(--tmuted);line-height:1.7;margin-bottom:7px;padding:6px 10px;background:rgba(232,149,109,0.06);border-radius:6px;border-left:2px solid rgba(232,149,109,0.3);}
+.cf-input,.cf-textarea{width:100%;background:var(--surf);border:0.5px solid var(--bd);border-radius:8px;padding:10px 13px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;color:var(--td);outline:none;transition:border-color 0.2s;}
+.cf-textarea{resize:vertical;min-height:72px;line-height:1.7;}
+.cf-input:focus,.cf-textarea:focus{border-color:var(--o1);}
+.cf-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
+.cf-chip{padding:6px 13px;border-radius:20px;border:0.5px solid var(--bd);background:var(--surf);font-size:12px;color:var(--tm);cursor:pointer;transition:all 0.18s;font-family:'Zen Kaku Gothic New',sans-serif;user-select:none;}
+.cf-chip.on{background:var(--peach);border-color:var(--o1);color:var(--ot);}
+.cf-divider{height:0.5px;background:var(--bd);margin:20px 0;}
+.cf-btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:10px;}
+.cf-btn-save{padding:10px 16px;background:transparent;color:var(--tmuted);border:0.5px solid var(--bd);border-radius:8px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.cf-btn-row-right{display:flex;gap:8px;}
+.cf-btn-back{padding:10px 18px;background:transparent;color:var(--tmuted);border:0.5px solid var(--bd);border-radius:8px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:12px;cursor:pointer;}
+.cf-btn-next{padding:10px 22px;background:linear-gradient(135deg,var(--o1),var(--o2));color:#fff;border:none;border-radius:8px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:7px;letter-spacing:0.04em;}
+.cf-save-notice{font-size:11px;color:var(--green);display:none;align-items:center;gap:4px;}
+.cf-save-notice.show{display:flex;}
+
+/* ============================================================
+   Step2 チャット
+============================================================ */
+.chat-wrap{display:flex;flex-direction:column;height:70vh;}
+.cf-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth;}
+.cf-messages::-webkit-scrollbar{width:4px;}
+.cf-messages::-webkit-scrollbar-thumb{background:rgba(180,140,120,0.3);border-radius:2px;}
+.msg{display:flex;gap:10px;animation:fadeUp 0.3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.msg.user{flex-direction:row-reverse;}
+.msg-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;}
+.msg-avatar.ai{background:linear-gradient(135deg,var(--o1),var(--o2));}
+.msg-avatar.user{background:#EDE8E0;border:0.5px solid rgba(180,140,120,0.3);}
+.msg-bubble{max-width:78%;padding:12px 16px;border-radius:12px;font-size:13.5px;line-height:1.85;letter-spacing:0.03em;}
+.msg.ai .msg-bubble{background:var(--surf);border:0.5px solid var(--bd);border-top-left-radius:3px;color:var(--td);}
+.msg.user .msg-bubble{background:var(--peach);border:0.5px solid rgba(232,149,109,0.3);border-top-right-radius:3px;color:var(--td);}
+.msg-bubble p{margin-bottom:6px;}
+.msg-bubble p:last-child{margin-bottom:0;}
+.msg-bubble ol{padding-left:18px;margin-top:6px;display:flex;flex-direction:column;gap:6px;}
+.msg-bubble ol li{font-size:13px;line-height:1.75;color:var(--tm);}
+.choice-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;max-width:78%;margin-left:40px;animation:fadeUp 0.35s ease;}
+.choice-btn{padding:8px 16px;border-radius:20px;border:0.5px solid var(--o1);background:var(--surf);color:var(--ot);font-family:'Zen Kaku Gothic New',sans-serif;font-size:12.5px;cursor:pointer;transition:all 0.18s;letter-spacing:0.03em;}
+.choice-btn:hover{background:var(--peach);border-color:var(--o2);}
+.choice-btn.free{border-color:var(--bd);color:var(--tmuted);background:transparent;}
+.choice-btn.used{opacity:0.4;cursor:not-allowed;pointer-events:none;}
+.typing{display:flex;gap:5px;align-items:center;padding:4px 0;}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--o1);animation:bounce 1.2s infinite;opacity:0.5;}
+.typing span:nth-child(2){animation-delay:0.2s;}
+.typing span:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.cf-input-area{border-top:0.5px solid var(--bd);padding:16px 24px;background:var(--surf);flex-shrink:0;}
+.cf-input-row{display:flex;gap:10px;align-items:flex-end;}
+.cf-chat-textarea{flex:1;background:#FBF5EE;border:0.5px solid var(--bd);border-radius:10px;padding:11px 14px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:14px;color:var(--td);resize:none;outline:none;min-height:46px;max-height:120px;line-height:1.6;transition:border-color 0.2s;}
+.cf-chat-textarea:focus{border-color:var(--o1);}
+.cf-chat-textarea::placeholder{color:var(--tmuted);}
+.cf-send{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--o1),var(--o2));border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.2s;}
+.cf-send:disabled{opacity:0.4;cursor:not-allowed;}
+.cf-send svg{width:18px;height:18px;fill:#fff;}
+.step3-banner{background:linear-gradient(135deg,#EEF8F2,#D8F0E2);border:0.5px solid rgba(90,146,104,0.3);border-radius:10px;padding:14px 18px;margin:0 24px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;animation:fadeUp 0.4s ease;}
+.step3-banner-text{font-size:12.5px;color:var(--green2);line-height:1.6;}
+.step3-banner-text strong{display:block;font-size:13px;margin-bottom:2px;}
+.btn-step3{padding:9px 20px;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;border:none;border-radius:8px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;letter-spacing:0.04em;}
+
+/* ============================================================
+   Step3 提出
+============================================================ */
+.sum-tabs{display:flex;gap:8px;margin-bottom:16px;}
+.sum-tab{padding:7px 18px;border-radius:20px;border:0.5px solid var(--bd);background:var(--surf);font-size:12px;color:var(--tmuted);cursor:pointer;font-family:'Zen Kaku Gothic New',sans-serif;transition:all 0.18s;}
+.sum-tab.active{background:var(--peach);border-color:var(--o1);color:var(--ot);}
+.sum-panel{display:none;}
+.sum-panel.show{display:block;}
+.ai-summary-box{background:var(--surf);border:0.5px solid var(--bd);border-radius:10px;padding:18px 20px;font-size:13px;line-height:1.9;color:var(--tm);white-space:pre-wrap;font-family:'Zen Kaku Gothic New',sans-serif;max-height:380px;overflow-y:auto;}
+.ai-summary-box::-webkit-scrollbar{width:4px;}
+.ai-summary-box::-webkit-scrollbar-thumb{background:rgba(180,140,120,0.3);border-radius:2px;}
+.raw-section{margin-bottom:18px;}
+.raw-section-title{font-family:'Shippori Mincho',serif;font-size:12px;font-weight:500;color:var(--o2);letter-spacing:0.1em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.raw-section-title::before{content:'';display:inline-block;width:2px;height:12px;background:linear-gradient(180deg,var(--o1),var(--o2));border-radius:2px;}
+.raw-item{margin-bottom:10px;}
+.raw-q{font-size:11px;color:var(--tmuted);margin-bottom:3px;}
+.raw-a{font-size:13px;color:var(--tm);line-height:1.75;background:var(--surf);border:0.5px solid var(--bd);border-radius:6px;padding:8px 12px;}
+.raw-empty{font-size:12px;color:rgba(160,136,120,0.45);font-style:italic;}
+.submit-note{font-size:12px;color:var(--tmuted);line-height:1.7;padding:10px 14px;background:rgba(232,149,109,0.06);border-radius:8px;border-left:2px solid rgba(232,149,109,0.3);margin-bottom:18px;}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.btn-ghost{padding:10px 18px;background:transparent;color:var(--tmuted);border:0.5px solid var(--bd);border-radius:8px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:12.5px;cursor:pointer;}
+.btn-ghost.orange{color:var(--ot);border-color:rgba(232,149,109,0.4);}
+.btn-submit{padding:11px 28px;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;border:none;border-radius:8px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:0.05em;transition:opacity 0.2s;}
+.btn-submit:disabled{opacity:0.5;cursor:not-allowed;}
+.complete-wrap{text-align:center;padding:48px 24px;}
+.complete-icon{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#EEF8F2,#D8F0E2);border:0.5px solid rgba(90,146,104,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;}
+.complete-title{font-family:'Shippori Mincho',serif;font-size:20px;font-weight:500;color:var(--green2);margin-bottom:8px;letter-spacing:0.06em;}
+.complete-sub{font-size:13px;color:var(--tmuted);line-height:1.8;}
+
+/* ============================================================
+   ボタン共通
+============================================================ */
+.btn-primary{padding:12px 28px;background:linear-gradient(135deg,var(--o1),var(--o2));color:#fff;border:none;border-radius:8px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:0.05em;width:100%;margin-top:4px;}
+
+/* ============================================================
+   印刷
+============================================================ */
+@media print{
+  body{background:#fff;padding:0;}
+  .cf{box-shadow:none;border:none;max-width:100%;}
+  .cf-header{background:#fff;border-bottom:1px solid #ddd;}
+  .cf-step-nav,.sum-tabs,.btn-row,.submit-note,.step3-banner,#step3-banner-area{display:none!important;}
+  .sum-panel{display:block!important;}
+  .sum-panel+.sum-panel{margin-top:32px;border-top:1px solid #ddd;padding-top:24px;}
+  .ai-summary-box{max-height:none;border:none;padding:0;font-size:12px;}
+  .cf-prog-area{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="cf" id="app">
+
+  <!-- ヘッダー（共通） -->
+  <div class="cf-header">
+    <div>
+      <div class="cf-logo">AIキャリア診断 <span style="font-size:10px;color:var(--tmuted);font-family:'Zen Kaku Gothic New',sans-serif;" id="header-step-label"></span></div>
+      <div class="cf-logo-sub" id="header-sub">面談前セルフアセスメント</div>
+    </div>
+    <div class="cf-prog-area" id="prog-area" style="display:none;">
+      <div class="cf-pct" id="pct-num">0%</div>
+      <div class="cf-prog-lbl" id="pct-label">入力中</div>
+      <div class="cf-prog-wrap"><div class="cf-prog-fill" id="prog-fill" style="width:0%;"></div></div>
+    </div>
+  </div>
+
+  <!-- ステップナビ（Step1〜3で表示） -->
+  <div class="cf-step-nav" id="step-nav" style="display:none;">
+    <div class="cf-step-item" id="nav-s1"><div class="cf-step-num">1</div>フォーム入力</div>
+    <div class="cf-step-item" id="nav-s2"><div class="cf-step-num">2</div>AIアシスタント</div>
+    <div class="cf-step-item" id="nav-s3"><div class="cf-step-num">3</div>提出</div>
+  </div>
+
+  <!-- ======================================================
+       画面0: アクセスコード
+  ====================================================== -->
+  <div class="screen active" id="screen-access">
+    <div class="access-wrap">
+      <div class="access-icon">🔑</div>
+      <div class="access-title">キャリア診断をはじめる</div>
+      <div class="access-sub">担当者からお伝えしたアクセスコードを<br>入力してセッションを開始してください</div>
+      <div class="access-input-row">
+        <input class="access-input" id="codeInput" placeholder="例：KC-A1B2-C3D4" maxlength="14"
+          oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')verifyCode()"/>
+        <button class="cf-btn-next" onclick="verifyCode()" id="codeBtn">→</button>
+      </div>
+      <div class="access-err" id="access-err"></div>
+      <div class="access-note">アクセスコードは担当のキャリアコンサルタントからお伝えします。<br>コードの有効期限は発行から7日間です。</div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       画面1: Step1 フォーム
+  ====================================================== -->
+  <div class="screen" id="screen-form">
+    <div class="cf-body" id="form-body"></div>
+  </div>
+
+  <!-- ======================================================
+       画面2: Step2 AIアシスタント
+  ====================================================== -->
+  <div class="screen" id="screen-chat">
+    <div class="chat-wrap">
+      <div class="cf-messages" id="messages"></div>
+      <div id="step3-banner-area"></div>
+      <div class="cf-input-area">
+        <div class="cf-input-row">
+          <textarea class="cf-chat-textarea" id="chatInput" placeholder="メッセージを入力してください…" rows="1"
+            onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="cf-send" id="sendBtn" onclick="sendChatMessage()">
+            <svg viewBox="0 0 24 24"><path d="M2 21L23 12 2 3v7l15 2-15 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       画面3: Step3 提出
+  ====================================================== -->
+  <div class="screen" id="screen-submit">
+    <div class="cf-body" id="submit-body">
+      <div class="sum-tabs">
+        <div class="sum-tab active" onclick="switchSumTab('ai')">AIサマリー</div>
+        <div class="sum-tab" onclick="switchSumTab('raw')">フォーム入力内容</div>
+      </div>
+      <div class="sum-panel show" id="panel-ai">
+        <div class="ai-summary-box" id="ai-summary-text">（読み込み中...）</div>
+      </div>
+      <div class="sum-panel" id="panel-raw">
+        <div id="raw-data-area"></div>
+      </div>
+      <div style="height:20px;"></div>
+      <div class="submit-note">上記の内容を担当のキャリアコンサルタントに送信します。氏名等の個人情報は含まれません。送信後の内容はアプリ側に保存されません。</div>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="copySummary()">AIサマリーをコピー</button>
+        <button class="btn-ghost orange" onclick="savePDF()">📄 PDFとして保存</button>
+        <button class="btn-submit" id="submitBtn" onclick="submitToGoogleForm()">担当者に提出する →</button>
+      </div>
+    </div>
+    <div style="display:none;" id="complete-wrap">
+      <div class="complete-wrap">
+        <div class="complete-icon">✅</div>
+        <div class="complete-title">提出が完了しました</div>
+        <div class="complete-sub">担当のキャリアコンサルタントに内容が送信されました。<br>面談当日にお会いできることを楽しみにしています。<br><br>このページは閉じていただいて構いません。</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /.cf -->
+
+<script>
+// ============================================================
+// ★ 設定（本番時に書き換える）
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbytUTlTaEyI1dPVZ5UE7F7nPPkyafpije4DCLyDbYtsIpsMKe-nZbzrNZgUksBPGYFD4Q/exec';
+const SECRET_TOKEN = 'xK9mP2nQ8rT5vW1yA4bC7dE0fG3hJ6kL';
+const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdr1dn5nxOUjartiBZtgMX7f1SrEqMaMjnEk2xAyagl5IBF-g/viewform';
+const FORM_ENTRY_AI  = 'entry.1350188080';
+const FORM_ENTRY_RAW = 'entry.450255826';
+
+// ============================================================
+// フォーム定義
+// ============================================================
+const REQ_GUIDE = '※ 必須項目ですが、うまく言葉にならない場合は「わからない」「特になし」と書いていただいて構いません。';
+const SECTION_LABELS = ['自己理解','仕事理解','コミュニケーション','中長期ビジョン','ビジネス資本','社会関係資本','金融資本'];
+const SECTIONS = [
+  {label:'自己理解', guide:REQ_GUIDE, questions:[
+    {t:'仕事・プライベートを問わず、時間を忘れて没頭できることは？',type:'textarea',req:true},
+    {t:'仕事や生活で「これが大事」と感じる価値観は？',type:'textarea',req:true,note:'例：自律性・人への貢献・成長・安定・チャレンジなど、思い浮かぶままに'},
+    {t:'自分の強みだと思うこと',type:'textarea',req:true,note:'他者に言われたことでも構いません'},
+    {t:'できれば避けたい仕事・状況・環境',type:'textarea',req:true},
+    {t:'最近、心が動いた出来事・ニュース・本など',type:'textarea',req:false}
+  ]},
+  {label:'仕事理解', guide:REQ_GUIDE, questions:[
+    {t:'現在の職種・役割・経験年数',type:'input',req:true,note:'例：作業療法士・回復期リハビリ病棟・5年'},
+    {t:'今の職務や役割を通して、どのような価値を提供していると感じていますか？またその経験は、あなたのキャリアにとってどんな意味を持ちますか？',type:'textarea',req:true},
+    {t:'興味のある職種・業界があれば、その仕事内容を具体的に教えてください',type:'textarea',req:false},
+    {t:'その職種・業界でのキャリアパスをどのように理解していますか？',type:'textarea',req:false,note:'キャリアパスとは「どのような経験・役割を経てどんな仕事に就けるか」という道筋のことです'},
+    {t:'現在検討していること',type:'chips',req:true,options:['転職を検討中','社内異動を希望','現職で働き方を変えたい','独立・起業を考えている','現職継続で成長したい','副業・複業を考えている','まだ決まっていない']}
+  ]},
+  {label:'コミュニケーション', guide:REQ_GUIDE, questions:[
+    {t:'家族・パートナーに、キャリアの悩みや方向性を話せていますか？',type:'chips',req:true,options:['よく話せている','少し話せている','あまり話せていない','全く話せていない','該当者がいない']},
+    {t:'職場の上司・同僚に、キャリアについて相談できていますか？',type:'chips',req:true,options:['よく相談できている','少し相談できている','あまりできていない','全くできていない']},
+    {t:'友人・知人に、キャリアの話をする機会がありますか？',type:'chips',req:true,options:['よくある','たまにある','ほとんどない','全くない']},
+    {t:'話せている・話せていない、それぞれの理由や背景があれば教えてください',type:'textarea',req:false},
+    {t:'「こうなりたい」と思えるロールモデル（人物・あり方）はいますか？',type:'textarea',req:false,note:'具体的な人物でも、こんな働き方・生き方という抽象的なイメージでも構いません'}
+  ]},
+  {label:'中長期ビジョン', guide:REQ_GUIDE, questions:[
+    {t:'3年後、仕事・生活・家族・自分自身として、どのような状態でいたいですか？',type:'textarea',req:true},
+    {t:'5年後・10年後、どのような姿でいたいですか？',type:'textarea',req:true,note:'仕事・生活・自分自身、思い浮かぶままに'},
+    {t:'ビジネスキャリアにおける「心理的成功」とは、あなたにとって何ですか？',type:'textarea',req:true,note:'心理的成功とは、他者の評価や肩書きではなく「自分自身が本当に満足できる仕事上の状態」のことです'},
+    {t:'ライフキャリアにおける「心理的成功」とは、あなたにとって何ですか？',type:'textarea',req:true,note:'仕事以外の人生全体（家族・健康・趣味・地域など）において、本当に満足できる状態とは何かを教えてください'}
+  ]},
+  {label:'ビジネス資本', guide:REQ_GUIDE, questions:[
+    {t:'保有している資格を教えてください',type:'input',req:true,note:'取得予定のものがあれば併記してください'},
+    {t:'専門的な知識・技術（テクニカルスキル）はありますか？',type:'textarea',req:true,note:'テクニカルスキルとは、特定の業務・職種に必要な専門的な知識や技術のことです（例：リハビリ評価・医療面接・統計分析など）'},
+    {t:'業種や職種を問わず活かせる能力（ポータブルスキル）はありますか？',type:'textarea',req:true,note:'ポータブルスキルとは、職場が変わっても持ち運べるスキルのことです（例：傾聴・問題解決・チームマネジメント・論理的思考など）'},
+    {t:'今後伸ばしたい・身につけたいスキルや知識',type:'textarea',req:false},
+    {t:'過去に最も成長を感じた経験',type:'textarea',req:false,note:'職種・プロジェクト・役割など、どんな経験でも構いません'}
+  ]},
+  {label:'社会関係資本', guide:REQ_GUIDE, questions:[
+    {t:'仕事上で頼れる・相談できる人はいますか？（社内外問わず）',type:'chips',req:true,options:['複数人いる','1〜2人いる','ほとんどいない']},
+    {t:'所属しているコミュニティ・勉強会・業界団体など',type:'input',req:false,note:'例：学会・職能団体・地域活動・オンラインコミュニティなど'},
+    {t:'SNSをビジネス目的で活用していますか？',type:'chips',req:true,options:['積極的に活用している','少し活用している','ほとんど活用していない','全く活用していない'],note:'情報発信・人脈形成・学習などを含みます'},
+    {t:'今後、つながりを広げたい領域・コミュニティはありますか？',type:'textarea',req:false},
+    {t:'これまでの行動の中で、人とのつながりを育てた経験があれば教えてください',type:'textarea',req:false,note:'例：勉強会への参加・副業・ボランティア・社外プロジェクトへの関与など'}
+  ]},
+  {label:'金融資本', guide:REQ_GUIDE, questions:[
+    {t:'お金に対してどのような価値観・考え方を持っていますか？',type:'textarea',req:true,note:'例：安定重視・リスクを取って増やしたい・手段として割り切っている・あまり意識していない、など'},
+    {t:'キャリア選択において、収入はどのくらい優先しますか？',type:'chips',req:true,options:['最優先事項','重要だが唯一ではない','やりがいの方が優先','あまり優先しない','わからない']},
+    {t:'現在、自己成長・キャリア形成のために自己投資していることはありますか？',type:'textarea',req:true,note:'例：研修・書籍・スクール・資格取得・副業・コーチングなど'},
+    {t:'金融・資産運用についての知識や関心はありますか？',type:'chips',req:false,options:['知識があり実践している','関心があり勉強中','あまり関心がない','よくわからない'],note:'キャリアの選択肢と経済的な自由度の関係を一緒に考えるための質問です'},
+    {t:'キャリアを進めるうえで、お金の面で制約になっていることがあれば教えてください',type:'textarea',req:false,note:'例：収入が下がる選択肢は取りにくい・学費が用意できないなど'}
+  ]}
+];
+
+// ============================================================
+// 状態管理
+// ============================================================
+let currentScreen = 'access';
+let formSection = 0;
+const formAnswers = {};
+SECTIONS.forEach((_,i) => formAnswers[i] = {});
+let chatHistory = [];
+let chatLoading = false;
+let chatProgress = 60;
+let step3Shown = false;
+
+// ============================================================
+// 画面遷移
+// ============================================================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  currentScreen = name;
+  updateNav(name);
+}
+
+function updateNav(name) {
+  const progArea = document.getElementById('prog-area');
+  const stepNav = document.getElementById('step-nav');
+  const headerSub = document.getElementById('header-sub');
+  const headerLabel = document.getElementById('header-step-label');
+
+  if (name === 'access') {
+    progArea.style.display = 'none';
+    stepNav.style.display = 'none';
+    headerLabel.textContent = '';
+    headerSub.textContent = '面談前セルフアセスメント';
+    return;
+  }
+
+  progArea.style.display = 'block';
+  stepNav.style.display = 'flex';
+
+  const navMap = {form:'nav-s1', chat:'nav-s2', submit:'nav-s3'};
+  const labelMap = {form:'Step 1', chat:'Step 2', submit:'Step 3'};
+  const subMap = {form:'フォーム入力', chat:'AIアシスタントによるヒアリング', submit:'サマリー確認・提出'};
+
+  document.querySelectorAll('.cf-step-item').forEach(el => {
+    el.classList.remove('active','done');
+    el.querySelector('.cf-step-num').textContent = el.id === 'nav-s1' ? '1' : el.id === 'nav-s2' ? '2' : '3';
+  });
+
+  const order = ['form','chat','submit'];
+  const cur = order.indexOf(name);
+  order.forEach((n, i) => {
+    const el = document.getElementById('nav-s' + (i+1));
+    if (i < cur) { el.classList.add('done'); el.querySelector('.cf-step-num').textContent = '✓'; }
+    else if (i === cur) el.classList.add('active');
+  });
+
+  headerLabel.textContent = labelMap[name];
+  headerSub.textContent = subMap[name];
+}
+
+// ============================================================
+// アクセスコード認証
+// ============================================================
+async function verifyCode() {
+  const code = document.getElementById('codeInput').value.trim();
+  const errEl = document.getElementById('access-err');
+  const btn = document.getElementById('codeBtn');
+
+  if (!code) { errEl.textContent = 'アクセスコードを入力してください。'; return; }
+  errEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = '確認中…';
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({action:'verifyCode', origin:window.location.origin, token:SECRET_TOKEN, code}),
+      redirect: 'follow'
+    });
+    const result = await res.json();
+    if (result.success && result.valid) {
+      localStorage.setItem('cd_access_code', code);
+      startForm();
+    } else {
+      errEl.textContent = result.message || 'コードが無効か、有効期限が切れています。';
+    }
+  } catch(e) {
+    // GAS未設定時はデモ動作
+    if (code.length >= 4) {
+      localStorage.setItem('cd_access_code', code);
+      startForm();
+    } else {
+      errEl.textContent = 'コードが短すぎます。担当者に確認してください。';
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = '→';
+}
+
+// ============================================================
+// Step1 フォーム
+// ============================================================
+function startForm() {
+  // ローカルストレージから復元
+  try {
+    const saved = localStorage.getItem('cf_answers');
+    const savedSec = localStorage.getItem('cf_section');
+    if (saved) { const p = JSON.parse(saved); Object.keys(p).forEach(k => { if(formAnswers[k]!==undefined) formAnswers[k]=p[k]; }); }
+    if (savedSec) { const sc = parseInt(savedSec); if (!isNaN(sc) && sc < SECTIONS.length) formSection = sc; }
+  } catch(e) {}
+  showScreen('form');
+  renderForm();
+}
+
+function chipToggle(opt, si, qi) {
+  formAnswers[si][qi] = formAnswers[si][qi] === opt ? '' : opt;
+  renderForm();
+}
+
+function countFormProgress() {
+  let total = 0, filled = 0;
+  SECTIONS.forEach((s, si) => {
+    s.questions.forEach((q, qi) => {
+      if (!q.req) return;
+      total++;
+      const v = formAnswers[si][qi];
+      if (v && String(v).trim().length > 0) filled++;
+    });
+  });
+  return total > 0 ? Math.round((filled / total) * 60) : 0;
+}
+
+function renderForm() {
+  const s = SECTIONS[formSection];
+  let html = '<div class="cf-sec-title">' + esc(s.label) + '</div>';
+  if (s.guide) html += '<div class="cf-sec-guide">' + esc(s.guide) + '</div>';
+
+  s.questions.forEach((q, qi) => {
+    const val = formAnswers[formSection][qi] || '';
+    html += '<div class="cf-group">';
+    html += '<label class="cf-label">' + esc(q.t) + (q.req ? '<span class="cf-req">必須</span>' : '<span class="cf-opt">任意</span>') + '</label>';
+    if (q.note) html += '<div class="cf-note">' + esc(q.note) + '</div>';
+
+    if (q.type === 'input') {
+      html += '<input class="cf-input" placeholder="入力してください" value="' + esc(val) + '" oninput="formAnswers[' + formSection + '][' + qi + ']=this.value;updateFormProgress();" />';
+    } else if (q.type === 'textarea') {
+      html += '<textarea class="cf-textarea" placeholder="自由に記入してください" oninput="formAnswers[' + formSection + '][' + qi + ']=this.value;updateFormProgress();">' + esc(val) + '</textarea>';
+    } else if (q.type === 'chips') {
+      if (q.note) html += '<div class="cf-note">' + esc(q.note) + '</div>';
+      html += '<div class="cf-chips">';
+      q.options.forEach(opt => {
+        const sel = val === opt;
+        html += '<div class="cf-chip' + (sel ? ' on' : '') + '" onclick="chipToggle(\'' + esc(opt) + '\',' + formSection + ',' + qi + ');">' + esc(opt) + '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div>';
+    if (qi < s.questions.length - 1) html += '<div class="cf-divider"></div>';
+  });
+
+  html += '<div class="cf-btn-row">';
+  html += '<div style="display:flex;align-items:center;gap:12px;">';
+  html += '<button class="cf-btn-save" onclick="saveFormLocal();">💾 途中保存</button>';
+  html += '<span class="cf-save-notice" id="save-notice">✓ 保存しました</span>';
+  html += '</div><div class="cf-btn-row-right">';
+  if (formSection > 0) html += '<button class="cf-btn-back" onclick="formSection--;renderForm();">← 前へ</button>';
+  if (formSection < SECTIONS.length - 1) {
+    html += '<button class="cf-btn-next" onclick="formSection++;renderForm();window.scrollTo(0,0);">次のセクションへ →</button>';
+  } else {
+    html += '<button class="cf-btn-next" style="background:linear-gradient(135deg,var(--green),var(--green2));" onclick="goToChat();">入力完了・ヒアリングへ →</button>';
+  }
+  html += '</div></div>';
+
+  document.getElementById('form-body').innerHTML = html;
+  updateFormProgress();
+  try { localStorage.setItem('cf_section', String(formSection)); } catch(e) {}
+}
+
+function updateFormProgress() {
+  const pct = countFormProgress();
+  document.getElementById('pct-num').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('pct-label').textContent = '入力中';
+}
+
+function saveFormLocal() {
+  try { localStorage.setItem('cf_answers', JSON.stringify(formAnswers)); } catch(e) {}
+  const n = document.getElementById('save-notice');
+  if (n) { n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 2000); }
+}
+
+// ============================================================
+// Step2 チャット
+// ============================================================
+function buildFormSummary() {
+  const lines = [];
+  SECTIONS.forEach((s, si) => {
+    lines.push('【' + s.label + '】');
+    s.questions.forEach((q, qi) => {
+      const v = formAnswers[si][qi];
+      if (v && String(v).trim()) lines.push('・' + q.t + '：' + v);
+    });
+  });
+  return lines.join('\n');
+}
+
+function buildChatSystemPrompt() {
+  return `あなたは「AIアシスタント」として、キャリア面談前の診断をサポートするアシスタントです。
+
+## 役割
+クライアントがキャリアコンサルタントとの対面面談をより充実したものにできるよう、フォームで収集した情報を補完・深化させることが目的です。アドバイス・評価・診断は一切行いません。情報を引き出し、整理することに徹してください。
+
+## クライアントのフォーム回答
+${buildFormSummary()}
+
+## セッションの流れ（厳守）
+1. フォーム回答全体を踏まえ、一言で温かく受け取る（共感・要約）。セッション終了時にサマリーが生成されることを一言添える。
+2. 「今回の面談で最も相談したいことを、自由に教えてください」と聞く。
+3. 相談内容と照らし合わせ、フォームで不足・浅いと判断した箇所を2〜3項目掘り下げる。
+4. 補完が十分になったら自然にクローズし、「サマリーを作成します。」と伝えてからサマリーを出力する。
+
+## 質問のルール
+- 関連する場合のみ2問まで同時に聞いてよい。その場合は以下の形式を使う：
+  「〜についてお聞きします。以下の2点を教えていただけますか？\n① 質問1\n② 質問2」
+- 無関係な複数質問は禁止。
+- 専門用語は使わず、日常の言葉で話す。
+
+## 選択肢ボタンの使い方（重要）
+クライアントが選ぶだけで答えられる質問の場合、以下の形式で選択肢を提示すること。
+形式：質問文の後に改行して [[選択肢A]] [[選択肢B]] [[選択肢C]] と並べる。必ず最後に [[その他（自由に入力）]] を加える。
+
+## トーン＆マナー
+- 敬語（です・ます調）を必ず使用する。
+- 支持的・中立的。共感はするが馴れ馴れしくしない。
+- 返答は短めに。クライアントの発言量と同程度を目安にする。
+
+## クローズとサマリー出力
+掘り下げ項目が2〜3項目完了したら、または5往復を超えたら自然にクローズする。
+「サマリーを作成します。」と一言伝えてから、必ず以下の形式でコードブロック内にサマリーを出力する：
+
+\`\`\`
+【AIサマリー｜キャリア診断】
+
+■ 今回の相談テーマ
+
+■ フォームで確認できた強み・資本
+・ビジネス資本：
+・社会関係資本：
+・金融資本：
+
+■ ヒアリングで明らかになったこと
+
+■ 面談で深掘りしたいこと（提案アジェンダ）
+・
+・
+
+■ 担当者への引き継ぎ注意事項
+・
+\`\`\``;
+}
+
+function goToChat() {
+  saveFormLocal();
+  showScreen('chat');
+  updateProgress(60, 'ヒアリング中');
+  chatHistory = [{ role: 'user', content: 'セッションを開始してください。' }];
+  callChatAPI();
+}
+
+function parseMessage(text) {
+  const choicePattern = /\[\[(.+?)\]\]/g;
+  const choices = [];
+  let m;
+  while ((m = choicePattern.exec(text)) !== null) choices.push(m[1]);
+  const bodyText = text.replace(/\[\[.+?\]\]/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  return { bodyText, choices };
+}
+
+function formatBody(text) {
+  const lines = text.split('\n');
+  let html = '', inList = false;
+  lines.forEach(line => {
+    const lm = line.match(/^[①②③④⑤](.+)/);
+    if (lm) {
+      if (!inList) { html += '<ol>'; inList = true; }
+      html += '<li>' + esc(lm[1].trim()) + '</li>';
+    } else {
+      if (inList) { html += '</ol>'; inList = false; }
+      if (line.trim()) html += '<p>' + esc(line) + '</p>';
+    }
+  });
+  if (inList) html += '</ol>';
+  return html;
+}
+
+function addChatMessage(role, text) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar ' + role;
+  if (role === 'ai') {
+    avatar.innerHTML = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2l1.5 5.5L17 9l-5.5 1.5L10 16l-1.5-5.5L3 9l5.5-1.5z" fill="white" opacity="0.9"/></svg>';
+  } else {
+    avatar.innerHTML = '<svg width="15" height="15" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" fill="#A08878"/><path d="M2 16c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#A08878" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>';
+  }
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+
+  if (role === 'ai') {
+    const { bodyText, choices } = parseMessage(text);
+    bubble.innerHTML = formatBody(bodyText);
+    div.appendChild(avatar); div.appendChild(bubble);
+    msgs.appendChild(div);
+    if (choices.length > 0) {
+      const row = document.createElement('div');
+      row.className = 'choice-row';
+      choices.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn' + (c.includes('自由に入力') ? ' free' : '');
+        btn.textContent = c;
+        btn.onclick = () => {
+          if (c.includes('自由に入力')) { document.getElementById('chatInput').focus(); }
+          else { row.querySelectorAll('.choice-btn').forEach(b => b.classList.add('used')); selectChoice(c); }
+        };
+        row.appendChild(btn);
+      });
+      msgs.appendChild(row);
+    }
+  } else {
+    bubble.textContent = text;
+    div.appendChild(avatar); div.appendChild(bubble);
+    msgs.appendChild(div);
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  const avatar = document.createElement('div');
+  avatar.className = 'msg-avatar ai';
+  avatar.innerHTML = '<svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 2l1.5 5.5L17 9l-5.5 1.5L10 16l-1.5-5.5L3 9l5.5-1.5z" fill="white" opacity="0.9"/></svg>';
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  div.appendChild(avatar); div.appendChild(bubble);
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function selectChoice(c) {
+  addChatMessage('user', c);
+  chatHistory.push({ role: 'user', content: c });
+  await callChatAPI();
+}
+
+async function callChatAPI() {
+  chatLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+  const typingEl = addTyping();
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({ action:'chat', origin:window.location.origin, token:SECRET_TOKEN, system:buildChatSystemPrompt(), messages:chatHistory }),
+      redirect: 'follow'
+    });
+    const result = await res.json();
+    if (!result.success) throw new Error(result.error || 'APIエラー');
+
+    const rawText = result.data.content?.[0]?.text || 'エラーが発生しました。';
+    typingEl.remove();
+
+    const summaryMatch = rawText.match(/```([\s\S]*?)```/);
+    const visibleText = rawText.replace(/```[\s\S]*?```/, '').trim();
+    if (visibleText) addChatMessage('ai', visibleText);
+
+    if (summaryMatch) {
+      localStorage.setItem('cd_ai_summary', summaryMatch[1].trim());
+      showStep3Banner();
+    } else {
+      const np = Math.min(89, chatProgress + Math.floor(Math.random() * 8 + 5));
+      updateProgress(np, 'ヒアリング中');
+      chatProgress = np;
+    }
+    chatHistory.push({ role: 'assistant', content: rawText });
+  } catch(e) {
+    typingEl.remove();
+    addChatMessage('ai', '接続エラーが発生しました。しばらくしてから再度お試しください。\n\nエラー：' + e.message);
+  }
+
+  chatLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+  document.getElementById('chatInput').focus();
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text || chatLoading) return;
+  input.value = ''; input.style.height = 'auto';
+  addChatMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  await callChatAPI();
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && e.metaKey && !e.isComposing) { e.preventDefault(); sendChatMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function showStep3Banner() {
+  if (step3Shown) return;
+  step3Shown = true;
+  updateProgress(90, '完了');
+  const area = document.getElementById('step3-banner-area');
+  area.innerHTML = `<div class="step3-banner"><div class="step3-banner-text"><strong>✅ ヒアリングが完了しました</strong>サマリーを確認して、担当者に提出してください。</div><button class="btn-step3" onclick="goToSubmit()">サマリーを提出する →</button></div>`;
+}
+
+// ============================================================
+// Step3 提出
+// ============================================================
+function goToSubmit() {
+  showScreen('submit');
+  updateProgress(90, '提出前');
+
+  const aiSummary = localStorage.getItem('cd_ai_summary');
+  document.getElementById('ai-summary-text').textContent = aiSummary || '（AIサマリーが見つかりませんでした。Step2を完了してから提出してください。）';
+  renderRawData();
+}
+
+function switchSumTab(name) {
+  document.querySelectorAll('.sum-tab').forEach((t, i) => t.classList.toggle('active', ['ai','raw'][i] === name));
+  document.getElementById('panel-ai').classList.toggle('show', name === 'ai');
+  document.getElementById('panel-raw').classList.toggle('show', name === 'raw');
+}
+
+function renderRawData() {
+  const area = document.getElementById('raw-data-area');
+  let html = '';
+  SECTIONS.forEach((s, si) => {
+    html += '<div class="raw-section"><div class="raw-section-title">' + esc(s.label) + '</div>';
+    s.questions.forEach((q, qi) => {
+      const v = formAnswers[si][qi];
+      const hasVal = v && String(v).trim();
+      html += '<div class="raw-item"><div class="raw-q">' + esc(q.t) + '</div>';
+      html += '<div class="raw-a">' + (hasVal ? esc(String(v)) : '<span class="raw-empty">未入力</span>') + '</div></div>';
+    });
+    html += '</div>';
+  });
+  area.innerHTML = html;
+}
+
+function buildRawText() {
+  const lines = [];
+  SECTIONS.forEach((s, si) => {
+    lines.push('【' + s.label + '】');
+    s.questions.forEach((q, qi) => {
+      const v = formAnswers[si][qi];
+      lines.push('・' + q.t + '：' + (v && String(v).trim() ? v : '（未入力）'));
+    });
+    lines.push('');
+  });
+  return lines.join('\n');
+}
+
+function copySummary() {
+  const text = localStorage.getItem('cd_ai_summary') || '';
+  navigator.clipboard.writeText(text).then(() => alert('✅ AIサマリーをコピーしました。'));
+}
+
+function savePDF() {
+  document.getElementById('panel-ai').classList.add('show');
+  document.getElementById('panel-raw').classList.add('show');
+  window.print();
+  switchSumTab('ai');
+}
+
+function submitToGoogleForm() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = '送信中...';
+
+  const aiSummary = localStorage.getItem('cd_ai_summary') || '（サマリーなし）';
+  const rawText = buildRawText();
+
+  if (GOOGLE_FORM_URL === 'YOUR_GOOGLE_FORM_URL_HERE') {
+    setTimeout(() => showComplete(), 1200);
+    return;
+  }
+
+  const params = new URLSearchParams();
+  params.set(FORM_ENTRY_AI, aiSummary);
+  params.set(FORM_ENTRY_RAW, rawText);
+  const submitUrl = GOOGLE_FORM_URL.replace('/viewform', '/formResponse') + '?' + params.toString();
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = submitUrl;
+  document.body.appendChild(iframe);
+  setTimeout(() => showComplete(), 1500);
+}
+
+function showComplete() {
+  document.getElementById('submit-body').style.display = 'none';
+  document.getElementById('complete-wrap').style.display = 'block';
+  updateProgress(100, '完了');
+}
+
+// ============================================================
+// 共通ユーティリティ
+// ============================================================
+function updateProgress(pct, label) {
+  document.getElementById('pct-num').textContent = pct + '%';
+  document.getElementById('prog-fill').style.width = pct + '%';
+  if (label) document.getElementById('pct-label').textContent = label;
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
