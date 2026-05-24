@@ -305,7 +305,8 @@ body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;jus
       <div style="font-size:11.5px;color:var(--tmuted);padding:8px 12px;background:rgba(232,149,109,0.06);border-radius:8px;border-left:2px solid rgba(232,149,109,0.3);margin-bottom:16px;line-height:1.7;">
         ※ この結果は同じブラウザ・同じデバイスからのみ確認できます。ブラウザのデータを消去すると閲覧できなくなります。
       </div>
-      <div class="btn-row">
+      <div class="btn-row" style="justify-content:space-between;">
+        <button class="btn-ghost" onclick="restartDiagnosis()" style="color:var(--tmuted);">もう一度診断を始める</button>
         <button class="btn-ghost orange" onclick="savePDFFromResult()">📄 PDFとして保存</button>
       </div>
     </div>
@@ -987,6 +988,26 @@ function savePDFFromResult() {
   switchResultTab('ai');
 }
 
+function restartDiagnosis() {
+  if (!confirm('診断データをリセットして最初からやり直しますか？\n※ 提出済みのサマリーは担当者に届いています。')) return;
+  // ローカルストレージをすべてクリア
+  localStorage.removeItem('cf_answers');
+  localStorage.removeItem('cf_section');
+  localStorage.removeItem('cd_ai_summary');
+  localStorage.removeItem('cd_completed');
+  localStorage.removeItem('cd_verified');
+  localStorage.removeItem('cd_access_code');
+  // アクセスコード入力画面に戻る
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-access').classList.add('active');
+  document.getElementById('prog-area').style.display = 'none';
+  document.getElementById('step-nav').style.display = 'none';
+  document.getElementById('header-step-label').textContent = '';
+  document.getElementById('header-sub').textContent = '面談前セルフアセスメント';
+  document.getElementById('codeInput').value = '';
+  document.getElementById('access-err').textContent = '';
+}
+
 // ============================================================
 // 共通ユーティリティ
 // ============================================================
@@ -1013,18 +1034,19 @@ window.onload = () => {
     localStorage.setItem('cf_form_version', FORM_VERSION);
   }
 
-  // 認証済みブラウザはコード入力をスキップ
-  const verified = localStorage.getItem('cd_verified');
-  if (verified === '1') {
-    startForm();
-    return;
-  }
-
-  // 完了済みの場合は結果確認画面を表示
+  // 優先順位1：提出済みの場合は結果確認画面を最優先で表示
   const aiSummary = localStorage.getItem('cd_ai_summary');
   const completed = localStorage.getItem('cd_completed');
   if (completed === '1' && aiSummary) {
     showResultScreen();
+    return;
+  }
+
+  // 優先順位2：認証済みブラウザはコード入力をスキップ
+  const verified = localStorage.getItem('cd_verified');
+  if (verified === '1') {
+    startForm();
+    return;
   }
 };
 
