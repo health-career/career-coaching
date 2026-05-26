@@ -633,23 +633,56 @@ ${buildFormSummary()}
 詳しくお聞きする項目が2〜3項目完了したら、または5往復を超えたらアジェンダ提案に移る。
 アジェンダのすり合わせが完了し「サマリー作成に進む」が選ばれたら、必ず以下の形式でコードブロック内にサマリーを出力する：
 
-\`\`\`
+以下の2つのブロックを必ず出力すること。
+
+【ブロック1】クライアント向けサマリー（```client_summaryで囲む）
+【ブロック2】担当者向け引き継ぎ事項（```consultant_noteで囲む）
+
+\`\`\`client_summary
 【AIサマリー｜キャリア診断】
 
 ■ 今回の相談テーマ
 
-■ フォームで確認できた強み・資本
+■ フォーム記載事項のサマリー
+
+＜自己理解＞
+・興味・関心：
+・価値観：
+・強み：
+・避けたいこと：
+・心身の状態：
+
+＜仕事理解＞
+・現在の職種・役割：
+・提供価値・意味づけ：
+・検討していること：
+
+＜中長期ビジョン＞
+・3年後の目標：
+・5〜10年後の目標：
+・ビジネスキャリアの心理的成功：
+・ライフキャリアの心理的成功：
+
+＜コミュニケーション＞
+・家族・パートナー：
+・職場：
+・友人・知人：
+・ロールモデル：
+
+＜キャリア資本＞
 ・ビジネス資本：
 ・社会関係資本：
 ・金融資本：
 
 ■ ヒアリングで明らかになったこと
 
-■ 面談で詳しくお聞きしたいこと（提案アジェンダ）
+■ 面談で担当者と深めたいこと
 ・
 ・
+\`\`\`
 
-■ 担当者への引き継ぎ注意事項
+\`\`\`consultant_note
+【担当者への引き継ぎ注意事項】
 ・
 \`\`\``;
 }
@@ -762,12 +795,14 @@ async function callChatAPI() {
     const rawText = result.data.content?.[0]?.text || 'エラーが発生しました。';
     typingEl.remove();
 
-    const summaryMatch = rawText.match(/```([\s\S]*?)```/);
-    const visibleText = rawText.replace(/```[\s\S]*?```/, '').trim();
+    const clientMatch = rawText.match(/```client_summary([\s\S]*?)```/);
+    const consultantMatch = rawText.match(/```consultant_note([\s\S]*?)```/);
+    const visibleText = rawText.replace(/```client_summary[\s\S]*?```/, '').replace(/```consultant_note[\s\S]*?```/, '').trim();
     if (visibleText) addChatMessage('ai', visibleText);
 
-    if (summaryMatch) {
-      localStorage.setItem('cd_ai_summary', summaryMatch[1].trim());
+    if (clientMatch) {
+      localStorage.setItem('cd_ai_summary', clientMatch[1].trim());
+      localStorage.setItem('cd_consultant_note', consultantMatch ? consultantMatch[1].trim() : '');
       showStep3Banner();
     } else {
       const np = Math.min(89, chatProgress + Math.floor(Math.random() * 8 + 5));
@@ -877,8 +912,12 @@ async function submitToGoogleForm() {
   btn.textContent = '送信中...';
 
   const aiSummary = localStorage.getItem('cd_ai_summary') || '（サマリーなし）';
+  const consultantNote = localStorage.getItem('cd_consultant_note') || '';
   const rawText = buildRawText();
   const accessCode = localStorage.getItem('cd_access_code') || '不明';
+
+  // 担当者向けの完全サマリー（クライアント向け＋引き継ぎ注意事項）
+  const fullSummary = aiSummary + (consultantNote ? '\n\n【担当者への引き継ぎ注意事項】\n' + consultantNote : '');
 
   // ① GASスプレッドシートにログ記録
   try {
@@ -891,7 +930,7 @@ async function submitToGoogleForm() {
         token: SECRET_TOKEN,
         logData: {
           accessCode: accessCode,
-          aiSummary: aiSummary,
+          aiSummary: fullSummary,
           rawData: rawText
         }
       }),
@@ -901,11 +940,11 @@ async function submitToGoogleForm() {
     console.warn('GASログ記録に失敗しました:', e.message);
   }
 
-  // ② Googleフォームに送信（新しいタブで開いて自動送信）
+  // ② Googleフォームに送信（担当者向け完全サマリーを送信）
   if (GOOGLE_FORM_URL !== 'YOUR_GOOGLE_FORM_URL_HERE') {
     try {
       const params = new URLSearchParams();
-      params.set(FORM_ENTRY_AI, aiSummary);
+      params.set(FORM_ENTRY_AI, fullSummary);
       params.set(FORM_ENTRY_RAW, rawText);
       const submitUrl = GOOGLE_FORM_URL.replace('/viewform', '/formResponse') + '?' + params.toString();
 
