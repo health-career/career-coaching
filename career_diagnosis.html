@@ -168,14 +168,36 @@ body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;jus
    印刷
 ============================================================ */
 @media print{
-  body{background:#fff;padding:0;}
-  .cf{box-shadow:none;border:none;max-width:100%;}
-  .cf-header{background:#fff;border-bottom:1px solid #ddd;}
+  @page{margin:20mm 18mm;}
+  body{background:#fff;padding:0;display:block;}
+  .cf{box-shadow:none;border:none;max-width:100%;border-radius:0;background:#fff;}
+  .cf-header{
+    background:linear-gradient(135deg,#FFF6ED 0%,#FDEBD0 40%,#FDF0E8 70%,#F0F9F5 100%)!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+    padding:14px 20px;border-bottom:1px solid rgba(180,140,120,0.3);
+    margin-bottom:8px;
+  }
+  .cf-logo{font-size:14px!important;color:#D4785A!important;}
+  .cf-logo-sub{font-size:10px!important;}
+  .cf-prog-area{display:none!important;}
   .cf-step-nav,.sum-tabs,.btn-row,.submit-note,.step3-banner,#step3-banner-area{display:none!important;}
   .sum-panel{display:block!important;}
-  .sum-panel+.sum-panel{margin-top:32px;border-top:1px solid #ddd;padding-top:24px;}
-  .ai-summary-box{max-height:none;border:none;padding:0;font-size:12px;}
-  .cf-prog-area{display:none;}
+  .sum-panel+.sum-panel{margin-top:24px;border-top:1px solid rgba(180,140,120,0.3);padding-top:20px;}
+  .ai-summary-box{
+    max-height:none!important;border:none!important;padding:0!important;
+    font-size:11.5px!important;line-height:1.9!important;
+    color:#2C1A0E!important;font-family:'Zen Kaku Gothic New',sans-serif!important;
+    white-space:pre-wrap!important;
+  }
+  .raw-section-title{
+    color:#D4785A!important;font-size:11px!important;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  .raw-q{font-size:10px!important;color:#A08878!important;}
+  .raw-a{font-size:11px!important;border:0.5px solid rgba(180,140,120,0.3)!important;padding:6px 10px!important;}
+  .raw-empty{font-size:10px!important;}
+  .complete-wrap{display:none!important;}
+  a{text-decoration:none!important;}
 }
 </style>
 </head>
@@ -339,7 +361,7 @@ const SECTIONS = [
     {t:'最近、仕事や生活の中で心身の疲れを感じていますか？',type:'chips',req:true,options:['元気である','あまり感じていない','少し感じている','かなり感じている','へとへとな感覚がある']}
   ]},
   {label:'仕事理解', guide:REQ_GUIDE, questions:[
-    {t:'現在の職種・役割・経験年数',type:'input',req:true,note:'例：作業療法士・回復期リハビリ病棟・5年'},
+    {t:'現在の業界・職種・経験年数',type:'input',req:true,note:'例：「医療・福祉／作業療法士／5年」「IT・Web／プロダクトマネージャー／3年」「製造・メーカー／営業職／8年」'},
     {t:'今の職務や役割を通して、どのような価値を提供していると感じていますか？またその経験は、あなたのキャリアにとってどんな意味を持ちますか？',type:'textarea',req:true},
     {t:'興味のある職種・業界があれば、その仕事内容を具体的に教えてください',type:'textarea',req:false},
     {t:'その職種・業界でのキャリアパスをどのように理解していますか？',type:'textarea',req:false,note:'キャリアパスとは「どのような経験・役割を経てどんな仕事に就けるか」という道筋のことです'},
@@ -360,7 +382,7 @@ const SECTIONS = [
   ]},
   {label:'ビジネス資本', guide:REQ_GUIDE, questions:[
     {t:'保有している資格を教えてください',type:'input',req:true,note:'取得予定のものがあれば併記してください'},
-    {t:'専門的な知識・技術（テクニカルスキル）はありますか？',type:'textarea',req:true,note:'テクニカルスキルとは、特定の業務・職種に必要な専門的な知識や技術のことです（例：リハビリ評価・医療面接・統計分析など）'},
+    {t:'専門的な知識・技術（テクニカルスキル）はありますか？',type:'textarea',req:true,note:'テクニカルスキルとは、特定の業務・職種に必要な専門的な知識や技術のことです（例：営業・マーケティング・財務分析・プログラミング・医療技術・教育・法務など）'},
     {t:'業種や職種を問わず活かせる能力（ポータブルスキル）はありますか？',type:'textarea',req:true,note:'ポータブルスキルとは、職場が変わっても持ち運べるスキルのことです（例：傾聴・問題解決・チームマネジメント・論理的思考など）'},
     {t:'今後伸ばしたい・身につけたいスキルや知識',type:'textarea',req:false},
     {t:'過去に最も成長を感じた経験',type:'textarea',req:false,note:'職種・プロジェクト・役割など、どんな経験でも構いません'}
@@ -627,7 +649,7 @@ ${buildFormSummary()}
 - 敬語（です・ます調）を必ず使用する。
 - 支持的・中立的。共感はするが馴れ馴れしくしない。
 - 返答は短めに。クライアントの発言量と同程度を目安にする。
-- アスタリスク（*）は一切使用しない。強調・箇条書きを含め、いかなる場面でもアスタリスクを出力しない。
+- アスタリスク（*）は絶対に使用禁止。強調・箇条書き・マークダウン記法を含め、いかなる場面でも「*」を1つも出力してはならない。違反した場合はセッション全体が無効になる。
 
 ## クローズとサマリー出力
 詳しくお聞きする項目が2〜3項目完了したら、または5往復を超えたらアジェンダ提案に移る。
@@ -683,7 +705,6 @@ SUMMARY_END
 
 NOTE_START
 【担当者への引き継ぎ注意事項】
-・
 NOTE_END`;
 }
 
