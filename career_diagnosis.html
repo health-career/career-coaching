@@ -635,10 +635,10 @@ ${buildFormSummary()}
 
 以下の2つのブロックを必ず出力すること。
 
-【ブロック1】クライアント向けサマリー（```client_summaryで囲む）
-【ブロック2】担当者向け引き継ぎ事項（```consultant_noteで囲む）
+【ブロック1】クライアント向けサマリー（SUMMARY_STARTとSUMMARY_ENDで囲む）
+【ブロック2】担当者向け引き継ぎ事項（NOTE_STARTとNOTE_ENDで囲む）
 
-\`\`\`client_summary
+SUMMARY_START
 【AIサマリー｜キャリア診断】
 
 ■ 今回の相談テーマ
@@ -679,12 +679,12 @@ ${buildFormSummary()}
 ■ 面談で担当者と深めたいこと
 ・
 ・
-\`\`\`
+SUMMARY_END
 
-\`\`\`consultant_note
+NOTE_START
 【担当者への引き継ぎ注意事項】
 ・
-\`\`\``;
+NOTE_END`;
 }
 
 function goToChat() {
@@ -795,9 +795,9 @@ async function callChatAPI() {
     const rawText = result.data.content?.[0]?.text || 'エラーが発生しました。';
     typingEl.remove();
 
-    const clientMatch = rawText.match(/```client_summary([\s\S]*?)```/);
-    const consultantMatch = rawText.match(/```consultant_note([\s\S]*?)```/);
-    const visibleText = rawText.replace(/```client_summary[\s\S]*?```/, '').replace(/```consultant_note[\s\S]*?```/, '').trim();
+    const clientMatch = rawText.match(/SUMMARY_START([\s\S]*?)SUMMARY_END/);
+    const consultantMatch = rawText.match(/NOTE_START([\s\S]*?)NOTE_END/);
+    const visibleText = rawText.replace(/SUMMARY_START[\s\S]*?SUMMARY_END/, '').replace(/NOTE_START[\s\S]*?NOTE_END/, '').trim();
     if (visibleText) addChatMessage('ai', visibleText);
 
     if (clientMatch) {
