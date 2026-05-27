@@ -37,7 +37,7 @@ body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;jus
 .cf-step-item{padding:11px 0;margin-right:20px;font-size:11px;color:var(--tmuted);letter-spacing:0.07em;border-bottom:2px solid transparent;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;}
 .cf-step-item.active{color:var(--o2);border-bottom-color:var(--o2);}
 .cf-step-item.done{color:var(--green);}
-#form-sec-nav .cf-step-item{color:var(--tmuted);border-bottom-color:transparent;}
+##form-sec-nav .cf-step-item{color:var(--tmuted);border-bottom-color:transparent;}
 #form-sec-nav .cf-step-item.active{color:var(--o2);border-bottom-color:var(--o2);font-weight:500;}
 #form-sec-nav .cf-step-item.done{color:var(--green);}
 #form-sec-nav .cf-step-item.active .cf-step-num{background:var(--o1);color:#fff;}
@@ -431,6 +431,7 @@ const SECTIONS = [
 // ============================================================
 let currentScreen = 'access';
 let formSection = 0;
+let formMaxCompleted = -1;
 const formAnswers = {};
 SECTIONS.forEach((_,i) => formAnswers[i] = {});
 let chatHistory = [];
