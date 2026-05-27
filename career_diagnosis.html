@@ -79,6 +79,8 @@ body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;jus
 .cf-opt{display:none;}
 .cf-note{font-size:11px;color:var(--tmuted);line-height:1.7;margin-bottom:7px;padding:6px 10px;background:rgba(232,149,109,0.06);border-radius:6px;border-left:2px solid rgba(232,149,109,0.3);}
 .cf-input,.cf-textarea{width:100%;background:var(--surf);border:0.5px solid var(--bd);border-radius:8px;padding:10px 13px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;color:var(--td);outline:none;transition:border-color 0.2s;}
+input[type="number"].cf-input{-moz-appearance:textfield;}
+input[type="number"].cf-input::-webkit-inner-spin-button,input[type="number"].cf-input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 .cf-textarea{resize:vertical;min-height:72px;line-height:1.7;}
 .cf-input:focus,.cf-textarea:focus{border-color:var(--o1);}
 .cf-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:2px;}
@@ -386,7 +388,7 @@ const SECTIONS = [
     {t:'雇用形態',type:'chips',req:false,options:['正社員','契約・派遣','フリーランス・個人事業主','複業','その他']},
     {t:'業界',type:'chips',req:false,options:['医療・福祉','IT・Web','製造・メーカー','金融・保険','教育','小売・サービス','コンサルティング','公務員・非営利','その他']},
     {t:'職種',type:'input',req:false,note:'例：理学療法士、営業、プロダクトマネージャーなど'},
-    {t:'経験年数',type:'chips',req:false,options:['1年未満','1〜3年','3〜5年','5〜10年','10〜20年','20年以上']},
+    {t:'経験年数',type:'input-suffix',suffix:'年目',req:false,note:'数字で入力してください（例：8）'},
     {t:'今回の面談で最も相談したいこと・整理したいことを教えてください',type:'textarea',req:false},
     {t:'そのきっかけとなった出来事や、最近の環境の変化があれば教えてください',type:'textarea',req:false,note:'例：「この業界・この職場に居続けて良いのかと不安になることが増えた」「仕事はうまくいっているのに、なぜか満たされない感覚が続いている」「育休復帰後、仕事と家事・育児の両立が難しくなってきた」「尊敬できる先輩の働き方を見て、自分もそうなりたいと思った」など'}
   ]},
@@ -607,7 +609,12 @@ function renderForm() {
     html += '<label class="cf-label">' + esc(q.t) + (q.req ? '<span class="cf-req">必須</span>' : '<span class="cf-opt">任意</span>') + '</label>';
     if (q.note) html += '<div class="cf-note">' + esc(q.note) + '</div>';
 
-    if (q.type === 'input') {
+    if (q.type === 'input-suffix') {
+      html += '<div style="display:flex;align-items:center;gap:8px;">';
+      html += '<input class="cf-input" style="width:100px;text-align:center;" type="number" min="1" max="60" placeholder="例：8" value="' + esc(val) + '" oninput="formAnswers[' + formSection + '][' + qi + ']=this.value;updateFormProgress();" />';
+      html += '<span style="font-size:13px;color:var(--tm);font-weight:500;">' + esc(q.suffix||'') + '</span>';
+      html += '</div>';
+    } else if (q.type === 'input') {
       html += '<input class="cf-input" placeholder="入力してください" value="' + esc(val) + '" oninput="formAnswers[' + formSection + '][' + qi + ']=this.value;updateFormProgress();" />';
     } else if (q.type === 'textarea') {
       html += '<textarea class="cf-textarea" placeholder="自由に記入してください" oninput="formAnswers[' + formSection + '][' + qi + ']=this.value;updateFormProgress();">' + esc(val) + '</textarea>';
