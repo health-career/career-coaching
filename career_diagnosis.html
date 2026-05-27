@@ -69,8 +69,8 @@ body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;jus
 .cf-sec-guide{font-size:11.5px;color:var(--tmuted);line-height:1.7;margin-bottom:18px;padding:8px 12px;background:rgba(232,149,109,0.07);border-radius:8px;}
 .cf-group{margin-bottom:18px;}
 .cf-label{display:block;font-size:12.5px;color:var(--tm);margin-bottom:6px;font-weight:500;letter-spacing:0.03em;line-height:1.65;}
-.cf-req{display:inline-block;font-size:9px;color:var(--o1);background:rgba(232,149,109,0.12);padding:1px 6px;border-radius:3px;margin-left:5px;vertical-align:middle;}
-.cf-opt{display:inline-block;font-size:9px;color:var(--tmuted);background:rgba(160,136,120,0.1);padding:1px 6px;border-radius:3px;margin-left:5px;vertical-align:middle;}
+.cf-req{display:none;}
+.cf-opt{display:none;}
 .cf-note{font-size:11px;color:var(--tmuted);line-height:1.7;margin-bottom:7px;padding:6px 10px;background:rgba(232,149,109,0.06);border-radius:6px;border-left:2px solid rgba(232,149,109,0.3);}
 .cf-input,.cf-textarea{width:100%;background:var(--surf);border:0.5px solid var(--bd);border-radius:8px;padding:10px 13px;font-family:'Zen Kaku Gothic New',sans-serif;font-size:13px;color:var(--td);outline:none;transition:border-color 0.2s;}
 .cf-textarea{resize:vertical;min-height:72px;line-height:1.7;}
@@ -361,7 +361,7 @@ const FORM_ENTRY_RAW = 'entry.450255826';
 // ============================================================
 // フォーム定義
 // ============================================================
-const REQ_GUIDE = '※ 必須項目ですが、うまく言葉にならない場合は「わからない」「特になし」と書いていただいて構いません。';
+const REQ_GUIDE = 'このAIキャリア診断は、キャリア面談前の思考整理・棚卸しを目的としたツールです。課題の解決や深い気づきは、対面でのキャリアコンサルティングで一緒に行います。\n全7セクション・計30問で構成されています。全ての質問に答える必要はありません。今の自分が答えられる範囲で構いません。回答が多いほどサマリーの精度は上がりますが、空欄があっても診断は完了します。';
 const SECTION_LABELS = ['自己理解','仕事理解','コミュニケーション','中長期ビジョン','ビジネス資本','社会関係資本','金融資本'];
 const SECTIONS = [
   {label:'自己理解', guide:REQ_GUIDE, questions:[
