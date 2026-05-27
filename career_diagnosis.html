@@ -985,6 +985,10 @@ async function submitToGoogleForm() {
   // 担当者向けの完全サマリー（クライアント向け＋引き継ぎ注意事項）
   const fullSummary = aiSummary + (consultantNote ? '\n\n' + consultantNote : '');
 
+  // キーワードをconsultantNoteから抽出
+  const kwMatch = consultantNote.match(/【セッションキーワード】\s*([\s\S]*?)(?:\n\n|$)/);
+  const keywords = kwMatch ? kwMatch[1].trim() : '';
+
   // ① GASスプレッドシートにログ記録
   try {
     await fetch(GAS_URL, {
@@ -997,7 +1001,8 @@ async function submitToGoogleForm() {
         logData: {
           accessCode: accessCode,
           aiSummary: fullSummary,
-          rawData: rawText
+          rawData: rawText,
+          keywords: keywords
         }
       }),
       redirect: 'follow'
