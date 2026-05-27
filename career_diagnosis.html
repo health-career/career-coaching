@@ -952,7 +952,7 @@ async function submitToGoogleForm() {
   const accessCode = localStorage.getItem('cd_access_code') || '不明';
 
   // 担当者向けの完全サマリー（クライアント向け＋引き継ぎ注意事項）
-  const fullSummary = aiSummary + (consultantNote ? '\n\n【担当者への引き継ぎ注意事項】\n' + consultantNote : '');
+  const fullSummary = aiSummary + (consultantNote ? '\n\n' + consultantNote : '');
 
   // ① GASスプレッドシートにログ記録
   try {
