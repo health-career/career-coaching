@@ -72,6 +72,24 @@ body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;jus
 .cf-sec-title{font-family:'Shippori Mincho',serif;font-size:13px;font-weight:500;color:var(--o2);letter-spacing:0.1em;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
 .cf-sec-title::before{content:'';display:inline-block;width:3px;height:13px;background:linear-gradient(180deg,var(--o1),var(--o2));border-radius:2px;}
 .cf-sec-guide{font-size:11.5px;color:var(--tmuted);line-height:1.7;margin-bottom:18px;padding:8px 12px;background:rgba(232,149,109,0.07);border-radius:8px;}
+.onboarding-wrap{background:linear-gradient(135deg,#FFF6ED,#FDEBD0,#FDF0E8,#F0F9F5);border-radius:16px;padding:32px 24px;margin-bottom:0;}
+.onboarding-title{font-size:20px;font-weight:500;color:#D4785A;letter-spacing:0.05em;text-align:center;margin-bottom:10px;}
+.onboarding-sub{font-size:11px;color:#A08878;letter-spacing:0.12em;text-align:center;margin-bottom:6px;}
+.onboarding-desc{font-size:12.5px;color:#6B4C3B;line-height:1.9;text-align:center;max-width:480px;margin:0 auto 28px;}
+.onboarding-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.onboarding-step{background:rgba(255,255,255,0.75);border-radius:12px;border:0.5px solid rgba(232,149,109,0.25);padding:18px 14px;text-align:center;}
+.onboarding-step-icon{width:48px;height:48px;border-radius:50%;background:rgba(232,149,109,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;color:#D4785A;}
+.onboarding-step-num{font-size:11px;color:#A08878;margin-bottom:4px;}
+.onboarding-step-title{font-size:13px;font-weight:500;color:#D4785A;margin-bottom:6px;}
+.onboarding-step-desc{font-size:11px;color:#6B4C3B;line-height:1.65;margin-bottom:8px;}
+.onboarding-step-time{font-size:10px;color:#A08878;padding:3px 8px;background:rgba(160,136,120,0.1);border-radius:10px;display:inline-block;}
+.onboarding-total{font-size:11px;color:#A08878;text-align:center;margin-bottom:16px;}
+.onboarding-save{border-left:3px solid #E8956D;padding:10px 14px;background:rgba(232,149,109,0.06);border-radius:0 8px 8px 0;margin-bottom:10px;}
+.onboarding-save-title{font-size:12px;font-weight:500;color:#D4785A;margin-bottom:4px;}
+.onboarding-save-body{font-size:11.5px;color:#6B4C3B;line-height:1.75;}
+.onboarding-note{font-size:11px;color:#A08878;line-height:1.7;padding:0 4px;margin-bottom:24px;}
+.onboarding-btn-wrap{text-align:center;}
+.onboarding-btn{display:inline-block;background:linear-gradient(135deg,#E8956D,#D4785A);color:#fff;border:none;border-radius:10px;padding:12px 36px;font-size:14px;font-weight:500;letter-spacing:0.05em;cursor:pointer;font-family:'Zen Kaku Gothic New',sans-serif;}
 .work-intro{background:linear-gradient(135deg,#FFF8F2,#FDF3EC);border:0.5px solid rgba(232,149,109,0.25);border-radius:12px;padding:16px 18px;margin-bottom:24px;}
 .work-intro-title{font-size:13px;font-weight:500;color:#D4785A;margin-bottom:8px;letter-spacing:0.08em;}
 .work-intro-text{font-size:12px;color:#6B4C3B;line-height:1.85;margin-bottom:12px;}
@@ -256,6 +274,54 @@ input[type="number"].cf-input::-webkit-inner-spin-button,input[type="number"].cf
     <div class="cf-step-item" id="fnav-2" onclick="jumpToSection(2)"><div class="cf-step-num">3</div>仕事のこと</div>
     <div class="cf-step-item" id="fnav-3" onclick="jumpToSection(3)"><div class="cf-step-num">4</div>周りとの関係</div>
     <div class="cf-step-item" id="fnav-4" onclick="jumpToSection(4)"><div class="cf-step-num">5</div>これからのこと</div>
+  </div>
+
+  <!-- ======================================================
+       画面0b: オンボーディング
+  ====================================================== -->
+  <div class="screen" id="screen-onboarding">
+    <div class="cf-body" style="padding:0;">
+      <div class="onboarding-wrap">
+        <div class="onboarding-sub">AIキャリア診断</div>
+        <div class="onboarding-title">はじめる前に</div>
+        <div class="onboarding-desc">
+          このAIキャリア診断は、キャリアコンサルタントとの面談をより充実させるための<strong>事前準備ツール</strong>です。<br>
+          整理した思考・情報はサマリーとして担当者に事前共有されるため、面談では最初から本質的な課題解決に時間を使うことができます。
+        </div>
+        <div class="onboarding-steps">
+          <div class="onboarding-step">
+            <div class="onboarding-step-icon"><i class="ti ti-clipboard-list" aria-hidden="true"></i></div>
+            <div class="onboarding-step-num">Step 1</div>
+            <div class="onboarding-step-title">フォーム入力</div>
+            <div class="onboarding-step-desc">自分の現状・価値観・これからのことを整理します</div>
+            <div class="onboarding-step-time">約10〜15分</div>
+          </div>
+          <div class="onboarding-step">
+            <div class="onboarding-step-icon"><i class="ti ti-message-chatbot" aria-hidden="true"></i></div>
+            <div class="onboarding-step-num">Step 2</div>
+            <div class="onboarding-step-title">AIと事前面談</div>
+            <div class="onboarding-step-desc">AIアシスタントと対話しながら面談アジェンダを整理します</div>
+            <div class="onboarding-step-time">約5〜10分</div>
+          </div>
+          <div class="onboarding-step">
+            <div class="onboarding-step-icon"><i class="ti ti-file-check" aria-hidden="true"></i></div>
+            <div class="onboarding-step-num">Step 3</div>
+            <div class="onboarding-step-title">サマリー提出</div>
+            <div class="onboarding-step-desc">AIが作成したサマリーを確認し、担当者に提出します</div>
+            <div class="onboarding-step-time">約1〜2分</div>
+          </div>
+        </div>
+        <div class="onboarding-total">合計所要時間の目安：15〜20分</div>
+        <div class="onboarding-save">
+          <div class="onboarding-save-title">途中保存に対応しています</div>
+          <div class="onboarding-save-body">好きなタイミングで中断・再開できます。まとまった時間が取れない方でもお気軽にはじめてください。</div>
+        </div>
+        <div class="onboarding-note">※ 途中保存はお使いのブラウザ・デバイスに保存されます。別のブラウザや端末からアクセスした場合、保存データが引き継がれませんのでご注意ください。</div>
+        <div class="onboarding-btn-wrap">
+          <button class="onboarding-btn" onclick="startFormFromOnboarding()">フォーム入力をはじめる →</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- ======================================================
@@ -465,7 +531,7 @@ function updateNav(name) {
 
   const formSecNav = document.getElementById('form-sec-nav');
 
-  if (name === 'access') {
+  if (name === 'access' || name === 'onboarding') {
     progArea.style.display = 'none';
     stepNav.style.display = 'none';
     if (formSecNav) formSecNav.style.display = 'none';
@@ -567,6 +633,28 @@ function updateFormSecNav() {
 }
 
 function startForm() {
+  const seen = localStorage.getItem('cd_onboarding_seen');
+  if (seen !== '1') {
+    showScreen('onboarding');
+    document.getElementById('prog-area').style.display = 'none';
+    document.getElementById('step-nav').style.display = 'none';
+    const fsn = document.getElementById('form-sec-nav');
+    if (fsn) fsn.style.display = 'none';
+    return;
+  }
+  // ローカルストレージから復元
+  try {
+    const saved = localStorage.getItem('cf_answers');
+    const savedSec = localStorage.getItem('cf_section');
+    if (saved) { const p = JSON.parse(saved); Object.keys(p).forEach(k => { if(formAnswers[k]!==undefined) formAnswers[k]=p[k]; }); }
+    if (savedSec) { const sc = parseInt(savedSec); if (!isNaN(sc) && sc < SECTIONS.length) formSection = sc; }
+  } catch(e) {}
+  showScreen('form');
+  renderForm();
+}
+
+function startFormFromOnboarding() {
+  localStorage.setItem('cd_onboarding_seen', '1');
   // ローカルストレージから復元
   try {
     const saved = localStorage.getItem('cf_answers');
@@ -1126,6 +1214,7 @@ function restartDiagnosis() {
   localStorage.removeItem('cd_completed');
   localStorage.removeItem('cd_verified');
   localStorage.removeItem('cd_access_code');
+  localStorage.removeItem('cd_onboarding_seen');
   // アクセスコード入力画面に戻る
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-access').classList.add('active');
