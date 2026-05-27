@@ -235,6 +235,14 @@ body{background:#F5EFE6;min-height:100vh;display:flex;align-items:flex-start;jus
     <div class="cf-step-item" id="nav-s2"><div class="cf-step-num">2</div>AIアシスタント</div>
     <div class="cf-step-item" id="nav-s3"><div class="cf-step-num">3</div>提出</div>
   </div>
+  <!-- フォームセクションタブナビ -->
+  <div class="cf-step-nav" id="form-sec-nav" style="display:none;background:#FDF7F2;">
+    <div class="cf-step-item" id="fnav-0" onclick="jumpToSection(0)"><div class="cf-step-num">1</div>基本情報</div>
+    <div class="cf-step-item" id="fnav-1" onclick="jumpToSection(1)"><div class="cf-step-num">2</div>自分のこと</div>
+    <div class="cf-step-item" id="fnav-2" onclick="jumpToSection(2)"><div class="cf-step-num">3</div>仕事のこと</div>
+    <div class="cf-step-item" id="fnav-3" onclick="jumpToSection(3)"><div class="cf-step-num">4</div>周りとの関係</div>
+    <div class="cf-step-item" id="fnav-4" onclick="jumpToSection(4)"><div class="cf-step-num">5</div>これからのこと</div>
+  </div>
 
   <!-- ======================================================
        画面0: アクセスコード
@@ -361,57 +369,54 @@ const FORM_ENTRY_RAW = 'entry.450255826';
 // ============================================================
 // フォーム定義
 // ============================================================
-const REQ_GUIDE = 'このAIキャリア診断は、キャリア面談前の思考整理・棚卸しを目的としたツールです。課題の解決や深い気づきは、対面でのキャリアコンサルティングで一緒に行います。\n全7セクション・計30問で構成されています。全ての質問に答える必要はありません。今の自分が答えられる範囲で構いません。回答が多いほどサマリーの精度は上がりますが、空欄があっても診断は完了します。';
-const SECTION_LABELS = ['自己理解','仕事理解','コミュニケーション','中長期ビジョン','ビジネス資本','社会関係資本','金融資本'];
+const SECTION_GUIDE = 'このAIキャリア診断は、キャリア面談前の思考整理・棚卸しを目的としたツールです。課題の解決や深い気づきは、対面でのキャリアコンサルティングで一緒に行います。\n全5セクション・34問で構成されています。全ての質問に答える必要はありません。今の自分が答えられる範囲で構いません。回答が多いほどサマリーの精度は上がりますが、空欄があっても診断は完了します。';
+
+const SECTION_LABELS = ['基本情報','自分のこと','仕事のこと','周りとの関係','これからのこと'];
+
 const SECTIONS = [
-  {label:'自己理解', guide:REQ_GUIDE, questions:[
-    {t:'仕事・プライベートを問わず、時間を忘れて没頭できることは？',type:'textarea',req:true},
-    {t:'仕事や生活で「これが大事」と感じる価値観は？',type:'textarea',req:true,note:'例：自律性・人への貢献・成長・安定・チャレンジなど、思い浮かぶままに'},
-    {t:'自分の強みだと思うこと',type:'textarea',req:true,note:'他者に言われたことでも構いません'},
-    {t:'できれば避けたい仕事・状況・環境',type:'textarea',req:true},
-    {t:'最近、心が動いた出来事・ニュース・本など',type:'textarea',req:false},
-    {t:'最近、仕事や生活の中で心身の疲れを感じていますか？',type:'chips',req:true,options:['元気である','あまり感じていない','少し感じている','かなり感じている','へとへとな感覚がある']}
+  {label:'基本情報', guide:SECTION_GUIDE, questions:[
+    {t:'年代',type:'chips',req:false,options:['20代','30代','40代','50代以上']},
+    {t:'性別',type:'chips',req:false,options:['男性','女性','非回答']},
+    {t:'雇用形態',type:'chips',req:false,options:['正社員','契約・派遣','フリーランス・個人事業主','複業','その他']},
+    {t:'業界',type:'chips',req:false,options:['医療・福祉','IT・Web','製造・メーカー','金融・保険','教育','小売・サービス','コンサルティング','公務員・非営利','その他']},
+    {t:'職種',type:'input',req:false,note:'例：理学療法士、営業、プロダクトマネージャーなど'},
+    {t:'経験年数',type:'chips',req:false,options:['1年未満','1〜3年','3〜5年','5〜10年','10〜20年','20年以上']},
+    {t:'今回の面談で最も相談したいこと・整理したいことを教えてください',type:'textarea',req:false},
+    {t:'そのきっかけとなった出来事や、最近の環境の変化があれば教えてください',type:'textarea',req:false,note:'例：「この業界・この職場に居続けて良いのかと不安になることが増えた」「仕事はうまくいっているのに、なぜか満たされない感覚が続いている」「育休復帰後、仕事と家事・育児の両立が難しくなってきた」「尊敬できる先輩の働き方を見て、自分もそうなりたいと思った」など'}
   ]},
-  {label:'仕事理解', guide:REQ_GUIDE, questions:[
-    {t:'現在の業界・職種・経験年数',type:'input',req:true,note:'例：「医療・福祉／作業療法士／5年」「IT・Web／プロダクトマネージャー／3年」「製造・メーカー／営業職／8年」'},
-    {t:'今の職務や役割を通して、どのような価値を提供していると感じていますか？またその経験は、あなたのキャリアにとってどんな意味を持ちますか？',type:'textarea',req:true},
+  {label:'自分のこと', guide:SECTION_GUIDE, questions:[
+    {t:'仕事・プライベートを問わず、好きなことや時間を忘れて没頭できることは？',type:'textarea',req:false},
+    {t:'仕事や生活で「これが大事」と感じる価値観は？',type:'textarea',req:false,note:'例：自律性・人への貢献・成長・安定・チャレンジなど、思い浮かぶままに'},
+    {t:'自分の強みだと思うこと',type:'textarea',req:false,note:'他者に言われたことでも構いません'},
+    {t:'できれば避けたい仕事・状況・環境',type:'textarea',req:false},
+    {t:'最近、心身の疲れを感じていますか？',type:'chips',req:false,options:['元気である','あまり感じていない','少し感じている','かなり感じている','へとへとな感覚がある']},
+    {t:'キャリア選択において、収入はどのくらい優先しますか？',type:'chips',req:false,options:['最優先事項','重要だが唯一ではない','やりがいの方が優先','あまり優先しない','わからない']},
+    {t:'現在、自己成長・キャリア形成のために自己投資していることはありますか？',type:'textarea',req:false,note:'例：研修・書籍・スクール・資格取得・コーチングなど'}
+  ]},
+  {label:'仕事のこと', guide:SECTION_GUIDE, questions:[
+    {t:'現在検討していること',type:'chips',req:false,options:['転職を検討中','社内異動を希望','現職で働き方を変えたい','独立・起業を考えている','現職継続で成長したい','副業・複業を考えている','まだ決まっていない']},
+    {t:'保有している資格',type:'input',req:false,note:'取得予定のものがあれば併記してください'},
+    {t:'専門的な知識・技術（テクニカルスキル）はありますか？',type:'textarea',req:false,note:'特定の業務・職種に必要な専門知識や技術（例：営業・マーケティング・財務分析・プログラミング・医療技術など）'},
+    {t:'業種や職種を問わず活かせる能力（ポータブルスキル）はありますか？',type:'textarea',req:false,note:'職場が変わっても持ち運べるスキル（例：傾聴・問題解決・チームマネジメント・論理的思考など）'},
+    {t:'SNSをビジネス目的で活用していますか？',type:'chips',req:false,options:['積極的に活用している','少し活用している','ほとんど活用していない','全く活用していない'],note:'情報発信・人脈形成・学習などを含みます'},
+    {t:'あなたは今の職務や役割にやりがいを感じていますか？',type:'chips',req:false,options:['とても感じている','まあ感じている','あまり感じていない','全く感じていない']},
+    {t:'その理由やきっかけとなったエピソードを教えてください',type:'textarea',req:false,note:'例：「担当した患者さんが退院して日常生活に戻れたと報告してくれた時にやりがいを感じた」「自分が企画した施策が数字として結果に出た時に手応えを感じた」「毎日同じ作業の繰り返しで、自分の成長が感じられなくなってきた」など'},
     {t:'興味のある職種・業界があれば、その仕事内容を具体的に教えてください',type:'textarea',req:false},
-    {t:'その職種・業界でのキャリアパスをどのように理解していますか？',type:'textarea',req:false,note:'キャリアパスとは「どのような経験・役割を経てどんな仕事に就けるか」という道筋のことです'},
-    {t:'現在検討していること',type:'chips',req:true,options:['転職を検討中','社内異動を希望','現職で働き方を変えたい','独立・起業を考えている','現職継続で成長したい','副業・複業を考えている','まだ決まっていない']}
+    {t:'希望するキャリアのポストに就くために、必要な経験・資格・スキルをどの程度把握していますか？',type:'chips',req:false,options:['具体的に把握している','なんとなく把握している','あまり把握できていない','わからない'],note:'例：昇進に必要な資格や試験の仕組み、転職先の業界で求められるスキル、希望する職位に就くために必要な経験など'}
   ]},
-  {label:'コミュニケーション', guide:REQ_GUIDE, questions:[
-    {t:'家族・パートナーに、キャリアの悩みや方向性を話せていますか？',type:'chips',req:true,options:['よく話せている','少し話せている','あまり話せていない','全く話せていない','該当者がいない']},
-    {t:'職場の上司・同僚に、キャリアについて相談できていますか？',type:'chips',req:true,options:['よく相談できている','少し相談できている','あまりできていない','全くできていない']},
-    {t:'友人・知人に、キャリアの話をする機会がありますか？',type:'chips',req:true,options:['よくある','たまにある','ほとんどない','全くない']},
+  {label:'周りとの関係', guide:SECTION_GUIDE, questions:[
+    {t:'家族・パートナーに、キャリアの悩みや方向性を話せていますか？',type:'chips',req:false,options:['よく話せている','少し話せている','あまり話せていない','全く話せていない','該当者がいない']},
+    {t:'職場の上司・同僚に、キャリアについて相談できていますか？',type:'chips',req:false,options:['よく相談できている','少し相談できている','あまりできていない','全くできていない']},
+    {t:'友人・知人に、キャリアの話をする機会がありますか？',type:'chips',req:false,options:['よくある','たまにある','ほとんどない','全くない']},
     {t:'話せている・話せていない、それぞれの理由や背景があれば教えてください',type:'textarea',req:false},
-    {t:'「こうなりたい」と思えるロールモデル（人物・あり方）はいますか？',type:'textarea',req:false,note:'具体的な人物でも、こんな働き方・生き方という抽象的なイメージでも構いません'}
+    {t:'「こうなりたい」と思えるロールモデルはいますか？',type:'textarea',req:false,note:'具体的な人物でも、こんな働き方・生き方という抽象的なイメージでも構いません'},
+    {t:'仕事上で頼れる・相談できる人はいますか？（社内外問わず）',type:'chips',req:false,options:['複数人いる','1〜2人いる','ほとんどいない']},
+    {t:'現在所属しているコミュニティ・組織・業界団体などはありますか？',type:'textarea',req:false,note:'例：学会・職能団体・地域活動・オンラインコミュニティなど'}
   ]},
-  {label:'中長期ビジョン', guide:REQ_GUIDE, questions:[
-    {t:'3年後の仕事や生活における具体的な目標はありますか？',type:'textarea',req:true,note:'例：「主任に昇進して後輩の指導をしている」「副業で月5万円の収入を得ながら本業を続けている」「時短勤務に切り替えて子育てと仕事を両立している」など、具体的なイメージで構いません'},
-    {t:'5年後・10年後の仕事や生活における具体的な目標はありますか？',type:'textarea',req:true,note:'例：「管理職として裁量のある仕事をしている」「在宅勤務中心の働き方に切り替えて家族との時間を大切にしている」「大学院に進学しながら現職を続けている」など、思い浮かぶままに'},
-    {t:'ビジネスキャリアにおける「心理的成功」とは、あなたにとって何ですか？',type:'textarea',req:true,note:'※心理的成功とは、他者からの評価や肩書きではなく、自分自身の価値観に基づいて「これでよかった」と感じられる内なる成功状態のことです'},
-    {t:'ライフキャリアにおける「心理的成功」とは、あなたにとって何ですか？',type:'textarea',req:true,note:'※心理的成功とは、他者からの評価や肩書きではなく、自分自身の価値観に基づいて「これでよかった」と感じられる内なる成功状態のことです'}
-  ]},
-  {label:'ビジネス資本', guide:REQ_GUIDE, questions:[
-    {t:'保有している資格を教えてください',type:'input',req:true,note:'取得予定のものがあれば併記してください'},
-    {t:'専門的な知識・技術（テクニカルスキル）はありますか？',type:'textarea',req:true,note:'テクニカルスキルとは、特定の業務・職種に必要な専門的な知識や技術のことです（例：営業・マーケティング・財務分析・プログラミング・医療技術・教育・法務など）'},
-    {t:'業種や職種を問わず活かせる能力（ポータブルスキル）はありますか？',type:'textarea',req:true,note:'ポータブルスキルとは、職場が変わっても持ち運べるスキルのことです（例：傾聴・問題解決・チームマネジメント・論理的思考など）'},
-    {t:'今後伸ばしたい・身につけたいスキルや知識',type:'textarea',req:false},
-    {t:'過去に最も成長を感じた経験',type:'textarea',req:false,note:'職種・プロジェクト・役割など、どんな経験でも構いません'}
-  ]},
-  {label:'社会関係資本', guide:REQ_GUIDE, questions:[
-    {t:'仕事上で頼れる・相談できる人はいますか？（社内外問わず）',type:'chips',req:true,options:['複数人いる','1〜2人いる','ほとんどいない']},
-    {t:'所属しているコミュニティ・勉強会・業界団体など',type:'input',req:false,note:'例：学会・職能団体・地域活動・オンラインコミュニティなど'},
-    {t:'SNSをビジネス目的で活用していますか？',type:'chips',req:true,options:['積極的に活用している','少し活用している','ほとんど活用していない','全く活用していない'],note:'情報発信・人脈形成・学習などを含みます'},
-    {t:'今後、つながりを広げたい領域・コミュニティはありますか？',type:'textarea',req:false},
-    {t:'これまでの行動の中で、人とのつながりを育てた経験があれば教えてください',type:'textarea',req:false,note:'例：勉強会への参加・副業・ボランティア・社外プロジェクトへの関与など'}
-  ]},
-  {label:'金融資本', guide:REQ_GUIDE, questions:[
-    {t:'お金に対してどのような価値観・考え方を持っていますか？',type:'textarea',req:true,note:'例：安定重視・リスクを取って増やしたい・手段として割り切っている・あまり意識していない、など'},
-    {t:'キャリア選択において、収入はどのくらい優先しますか？',type:'chips',req:true,options:['最優先事項','重要だが唯一ではない','やりがいの方が優先','あまり優先しない','わからない']},
-    {t:'現在、自己成長・キャリア形成のために自己投資していることはありますか？',type:'textarea',req:true,note:'例：研修・書籍・スクール・資格取得・副業・コーチングなど'},
-    {t:'金融・資産運用についての知識や関心はありますか？',type:'chips',req:false,options:['知識があり実践している','関心があり勉強中','あまり関心がない','よくわからない'],note:'キャリアの選択肢と経済的な自由度の関係を一緒に考えるための質問です'},
-    {t:'キャリアを進めるうえで、お金の面で制約になっていることがあれば教えてください',type:'textarea',req:false,note:'例：収入が下がる選択肢は取りにくい・学費が用意できないなど'}
+  {label:'これからのこと', guide:SECTION_GUIDE, questions:[
+    {t:'3年後の仕事や生活における具体的な目標はありますか？',type:'textarea',req:false,note:'例：「主任に昇進して後輩の指導をしている」「副業で月5万円の収入を得ながら本業を続けている」「時短勤務に切り替えて子育てと仕事を両立している」など'},
+    {t:'5年後・10年後の仕事や生活における具体的な目標はありますか？',type:'textarea',req:false,note:'例：「管理職として裁量のある仕事をしている」「在宅勤務中心の働き方に切り替えて家族との時間を大切にしている」「大学院に進学しながら現職を続けている」など'},
+    {t:'先ほど挙げた目標を達成したとき、あるいは達成に向けて努力しているとき、あなたはどのような感覚や状態になっていると思いますか？',type:'textarea',req:false,note:'評価や肩書きではなく、自分の内側から感じる感覚についてお聞きします。例：「自分の判断で動けている充実感がある」「家族に誇れる働き方ができている」「毎朝仕事に向かうのが楽しみになっている」「自分らしく生きている実感がある」など、ぼんやりとしたイメージでも構いません。'}
   ]}
 ];
 
@@ -443,9 +448,12 @@ function updateNav(name) {
   const headerSub = document.getElementById('header-sub');
   const headerLabel = document.getElementById('header-step-label');
 
+  const formSecNav = document.getElementById('form-sec-nav');
+
   if (name === 'access') {
     progArea.style.display = 'none';
     stepNav.style.display = 'none';
+    if (formSecNav) formSecNav.style.display = 'none';
     headerLabel.textContent = '';
     headerSub.textContent = '面談前セルフアセスメント';
     return;
@@ -453,6 +461,7 @@ function updateNav(name) {
 
   progArea.style.display = 'block';
   stepNav.style.display = 'flex';
+  if (formSecNav) formSecNav.style.display = name === 'form' ? 'flex' : 'none';
 
   const navMap = {form:'nav-s1', chat:'nav-s2', submit:'nav-s3'};
   const labelMap = {form:'Step 1', chat:'Step 2', submit:'Step 3'};
@@ -521,6 +530,27 @@ async function verifyCode() {
 // ============================================================
 // Step1 フォーム
 // ============================================================
+function jumpToSection(idx) {
+  formSection = idx;
+  renderForm();
+  window.scrollTo(0, 0);
+}
+
+function updateFormSecNav() {
+  for (let i = 0; i < 5; i++) {
+    const el = document.getElementById('fnav-' + i);
+    if (!el) continue;
+    el.classList.remove('active', 'done');
+    el.querySelector('.cf-step-num').textContent = i + 1;
+    if (i < formSection) {
+      el.classList.add('done');
+      el.querySelector('.cf-step-num').textContent = '✓';
+    } else if (i === formSection) {
+      el.classList.add('active');
+    }
+  }
+}
+
 function startForm() {
   // ローカルストレージから復元
   try {
@@ -594,6 +624,7 @@ function renderForm() {
 
   document.getElementById('form-body').innerHTML = html;
   updateFormProgress();
+  updateFormSecNav();
   try { localStorage.setItem('cf_section', String(formSection)); } catch(e) {}
 }
 
@@ -665,58 +696,49 @@ ${buildFormSummary()}
 
 ## クローズとサマリー出力
 詳しくお聞きする項目が2〜3項目完了したら、または5往復を超えたらアジェンダ提案に移る。
-アジェンダのすり合わせが完了し「サマリー作成に進む」が選ばれたら、必ず以下の形式でコードブロック内にサマリーを出力する：
+アジェンダのすり合わせが完了し「サマリー作成に進む」が選ばれたら、必ず以下の2つのブロックを出力すること。
 
-以下の2つのブロックを必ず出力すること。
-
-【ブロック1】クライアント向けサマリー（SUMMARY_STARTとSUMMARY_ENDで囲む）
+【ブロック1】クライアント向けサマリー（必ずSUMMARY_STARTで始めてSUMMARY_ENDで終わること）
 【ブロック2】担当者向け引き継ぎ事項（必ずNOTE_STARTで始めてNOTE_ENDで終わること。NOTE_ENDを省略しないこと）
 
 SUMMARY_START
 【AIサマリー｜キャリア診断】
 
-■ 今回の相談テーマ
+■ 主訴
+今回の相談テーマを1〜2文で簡潔に記述する。
+
+■ きっかけ・背景
+フォームの記載内容とAIヒアリングで得られた情報を統合し、クライアントが語った言葉のニュアンスを大切にしながら充実した内容で記述する。分量はフォーム・ヒアリングの情報量に応じて柔軟に調整してよい。相談テーマとの関連が強い情報を優先すること。
 
 ■ フォーム記載事項のサマリー
 
-＜自己理解＞
-・興味・関心：
-・価値観：
-・強み：
-・避けたいこと：
-・心身の状態：
+＜自分のこと＞
+価値観・強み・避けたいこと・心身の状態・収入への向き合い方・自己投資の状況などを、相談テーマとの関連が強いものを優先して要約する。入力がない項目は省略してよい。
 
-＜仕事理解＞
-・現在の職種・役割：
-・提供価値・意味づけ：
-・検討していること：
+＜仕事のこと＞
+現在の検討事項・スキル・やりがい・興味のある職種・キャリアパスへの理解度などを要約する。入力がない項目は省略してよい。
 
-＜中長期ビジョン＞
-・3年後の目標：
-・5〜10年後の目標：
-・ビジネスキャリアの心理的成功：
-・ライフキャリアの心理的成功：
+＜周りとの関係＞
+家族・職場・友人とのコミュニケーション状況・ロールモデル・つながりの状況などを要約する。入力がない項目は省略してよい。
 
-＜コミュニケーション＞
-・家族・パートナー：
-・職場：
-・友人・知人：
-・ロールモデル：
-
-＜キャリア資本＞
-・ビジネス資本：
-・社会関係資本：
-・金融資本：
+＜これからのこと＞
+3年後・5〜10年後の目標と、目標達成時の心理的成功のイメージを要約する。入力がない項目は省略してよい。
 
 ■ ヒアリングで明らかになったこと
+AIアシスタントとの対話を通じて浮かび上がった気づき・感情・背景を記述する。フォームだけでは見えなかった情報を中心に書くこと。
 
 ■ 面談で担当者と深めたいこと
+クライアントとのすり合わせを経た面談アジェンダを2〜3項目記述する。
 ・
 ・
 SUMMARY_END
 
 NOTE_START
 【担当者への引き継ぎ注意事項】
+面談を進める上で特に注意すべき点・配慮すべき点を記述する。（例：心身の疲れが強い・家族への相談がしにくい状況・職場での孤立感など）
+
+【セッションキーワード】
+今回のセッションを象徴するキーワードを最大10個、読点区切りで記述する。（例：転職、ライフキャリア、心身の疲れ、自律性、育児との両立など）
 NOTE_END`;
 }
 
