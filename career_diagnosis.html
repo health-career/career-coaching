@@ -607,7 +607,7 @@ function renderForm() {
     const val = formAnswers[formSection][qi] || '';
     html += '<div class="cf-group">';
     html += '<label class="cf-label">' + esc(q.t) + (q.req ? '<span class="cf-req">必須</span>' : '<span class="cf-opt">任意</span>') + '</label>';
-    if (q.note) html += '<div class="cf-note">' + esc(q.note) + '</div>';
+    if (q.note && q.type !== 'chips') html += '<div class="cf-note">' + esc(q.note) + '</div>';
 
     if (q.type === 'input-suffix') {
       html += '<div style="display:flex;align-items:center;gap:8px;">';
@@ -688,9 +688,9 @@ function buildChatSystemPrompt() {
 ${buildFormSummary()}
 
 ## セッションの流れ（厳守）
-1. フォーム回答全体を踏まえ、一言で温かく受け取る（共感・要約）。セッション終了時にサマリーが生成されることを一言添える。
-2. 「今回の面談で最も相談したいことを、自由に教えてください」と聞く。
-3. 相談内容と照らし合わせ、フォームで不足・浅いと判断した箇所を2〜3項目詳しくお聞きする。
+1. フォーム回答全体（特に「今回の面談で最も相談したいこと」「そのきっかけ」）を踏まえ、クライアントの相談テーマを1〜2文で要約して確認する。温かく受け取り、セッション終了時にサマリーが生成されることを一言添える。相談テーマを再度聞き直してはいけない。
+2. フォームの相談テーマ・きっかけを起点に、不足・浅いと判断した箇所を2〜3項目詳しくお聞きする。
+3. 詳しくお聞きする項目が完了したら、面談アジェンダを2〜3項目提案する。
 4. 詳しくお聞きする項目が完了したら、面談アジェンダを2〜3項目提案する。以下の形式で伝える：
    「今回のお話を踏まえると、面談では以下について探求できると思います。いかがでしょうか？よろしければサマリー作成に進みます。
 ① アジェンダ1
