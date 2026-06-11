@@ -122,22 +122,13 @@ body{
 .r-hero{text-align:center;padding:44px 0 10px;}
 .r-eyebrow{font-size:11px;letter-spacing:.26em;color:var(--tmuted);margin-bottom:22px;}
 .r-badge{
-  width:168px;height:168px;margin:0 auto;border-radius:50%;position:relative;
+  width:220px;height:220px;margin:0 auto;position:relative;
   display:flex;align-items:center;justify-content:center;
-  overflow:hidden;
-  background:radial-gradient(circle at 50% 38%,#FFF6EA,#FBE9D6 70%);
-  border:1.5px solid rgba(232,151,109,.45);
-  box-shadow:0 0 0 10px rgba(232,193,112,.14),0 0 0 22px rgba(232,193,112,.06),0 14px 30px rgba(212,120,90,.18);
   animation:badgein .9s cubic-bezier(.2,.9,.3,1.2);
 }
 @keyframes badgein{from{transform:scale(.4);opacity:0;}to{transform:scale(1);opacity:1;}}
-.r-badge img{width:100%;height:100%;object-fit:cover;display:block;}
-.r-badge .acc{
-  position:absolute;top:4px;right:4px;font-size:28px;font-style:normal;
-  filter:drop-shadow(0 2px 4px rgba(58,51,48,.18));
-  animation:accin 1.2s ease;
-  z-index:1;
-}
+.r-badge img{width:100%;height:100%;object-fit:contain;display:block;}
+.r-badge .acc{display:none;}
 
 @keyframes accin{0%,55%{transform:scale(0);opacity:0;}80%{transform:scale(1.25);}100%{transform:scale(1);opacity:1;}}
 .r-typecode{margin-top:22px;font-size:12px;letter-spacing:.3em;color:var(--or2);font-weight:700;}
@@ -600,9 +591,9 @@ function showResult(){
     (mood === 'E' ? '人と関わって充電 ' + ePct + '%' : '一人で深めて充電 ' + (100 - ePct) + '%');
 
   // Xシェアリンク
-  var shareText = '私のキャリアタイプは「' + T.name + '」でした！%0A%23はたらく才能診断%0A';
+  var rawShareText = '私のキャリアタイプは「' + T.name + '」でした！\n#はたらく才能診断\n' + location.href;
   document.getElementById('r-share').href =
-    'https://twitter.com/intent/tweet?text=' + shareText + encodeURIComponent(location.href);
+    'https://twitter.com/intent/tweet?text=' + encodeURIComponent(rawShareText);
 
   show('result');
 }
