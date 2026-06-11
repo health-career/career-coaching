@@ -299,7 +299,7 @@ body{
     </div>
 
     <div class="r-actions">
-      <button class="btn-sub" id="r-share" onclick="shareResult()">𝕏でシェア（画像付き）</button>
+      <button class="btn-sub" id="r-share" onclick="shareResult()">𝕏でシェア</button>
       <button class="btn-sub" onclick="restart()">もう一度診断する</button>
     </div>
     <p class="r-disclaimer">本診断はキャリアアンカー理論を参考にした自己理解のためのエンタメコンテンツです。<br>結果はブラウザ内でのみ計算され、外部に送信されることはありません。</p>
@@ -581,30 +581,15 @@ function showResult(){
 }
 
 // ============================================================
-// シェア機能
-// ① Web Share API（モバイル・画像添付対応）
-// ② 非対応時は X intent にフォールバック
+// シェア機能（X intent）
 // ============================================================
-async function shareResult(){
+function shareResult(){
   var shareText = '私のキャリアタイプは「' + currentTypeName + '」でした！\n#はたらく才能診断';
   var shareUrl  = 'https://health-career.github.io/career-coaching/shindan.html';
-
-  if(navigator.canShare){
-    try{
-      var res  = await fetch('images/' + currentTypeKey + '.png');
-      var blob = await res.blob();
-      var file = new File([blob], currentTypeKey + '.png', {type:'image/png'});
-      var data = {title:'はたらく才能診断', text:shareText, files:[file]};
-      if(navigator.canShare(data)){
-        await navigator.share(data);
-        return;
-      }
-    }catch(e){}
-  }
-
-  // フォールバック：X intent
-  var xText = encodeURIComponent(shareText + '\n' + shareUrl);
-  window.open('https://x.com/intent/tweet?text=' + xText, '_blank', 'noopener');
+  window.open(
+    'https://x.com/intent/tweet?text=' + encodeURIComponent(shareText + '\n' + shareUrl),
+    '_blank', 'noopener'
+  );
 }
 
 </script>
