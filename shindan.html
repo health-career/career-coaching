@@ -299,7 +299,7 @@ body{
     </div>
 
     <div class="r-actions">
-      <a class="btn-sub" id="r-share" href="#" target="_blank" rel="noopener noreferrer">𝕏でシェア</a>
+      <button class="btn-sub" id="r-share" onclick="shareResult()">𝕏でシェア</button>
       <button class="btn-sub" onclick="restart()">もう一度診断する</button>
     </div>
     <p class="r-disclaimer">本診断はキャリアアンカー理論を参考にした自己理解のためのエンタメコンテンツです。<br>結果はブラウザ内でのみ計算され、外部に送信されることはありません。</p>
@@ -577,15 +577,43 @@ function showResult(){
   currentTypeKey = typeKey;
   currentTypeName = T.name;
 
-  // シェアリンクをaタグに直接セット
-  var shareText = '私のキャリアタイプは「' + T.name + '」でした！\n#はたらく才能診断';
-  var shareUrl  = 'https://health-career.github.io/career-coaching/shindan.html';
-  document.getElementById('r-share').href =
-    'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText + '\n' + shareUrl);
-
   show('result');
 }
 
+// ============================================================
+// シェア機能：スマホ → X intent / PC → クリップボードコピー
+// ============================================================
+function shareResult(){
+  var shareText = '私のキャリアタイプは「' + currentTypeName + '」でした！\n#はたらく才能診断\nhttps://health-career.github.io/career-coaching/shindan.html';
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if(isMobile){
+    // スマホ：X intentで直接開く
+    window.open(
+      'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText),
+      '_blank'
+    );
+  } else {
+    // PC：クリップボードにコピー
+    var btn = document.getElementById('r-share');
+    navigator.clipboard.writeText(shareText).then(function(){
+      btn.textContent = '✓ コピーしました！Xに貼り付けてポスト';
+      btn.style.color = '#3D7A70';
+      btn.style.borderColor = '#3D7A70';
+      setTimeout(function(){
+        btn.textContent = '𝕏でシェア';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 3000);
+    }).catch(function(){
+      // clipboard API不可の場合はintentにフォールバック
+      window.open(
+        'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText),
+        '_blank'
+      );
+    });
+  }
+}
 
 </script>
 </body>
