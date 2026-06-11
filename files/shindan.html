@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>はたらく才能診断｜あなたのキャリアタイプを16タイプで診断</title>
+<meta name="description" content="30の質問に答えるだけで、あなたの「はたらく才能」が16タイプでわかる無料診断。登録不要・約5分。">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FDFAF5;
+  --ink:#3A3330;
+  --tmuted:#8C7F76;
+  --or1:#E8956D;
+  --or2:#D4785A;
+  --gold:#E8C170;
+  --teal:#3D7A70;
+  --line:rgba(58,51,48,0.10);
+  --card:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'M PLUS Rounded 1c',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+}
+.serif{font-family:'M PLUS Rounded 1c',sans-serif;}
+.wrap{max-width:460px;margin:0 auto;padding:0 20px 80px;}
+.screen{display:none;}
+.screen.active{display:block;animation:fadein .4s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;}
+}
+
+/* ===== トップ画面 ===== */
+.top-hero{text-align:center;padding:56px 0 8px;}
+.top-eyebrow{font-size:11px;letter-spacing:.28em;color:var(--or2);font-weight:700;margin-bottom:18px;}
+.top-title{
+  font-family:'M PLUS Rounded 1c',sans-serif;
+  font-size:30px;font-weight:700;line-height:1.5;letter-spacing:.04em;
+}
+.top-title em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--or1),var(--or2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.top-lead{font-size:13.5px;color:var(--tmuted);margin-top:16px;line-height:2;}
+.compass{width:170px;height:170px;margin:34px auto 30px;position:relative;}
+.compass svg.ring{width:100%;height:100%;animation:slowspin 24s linear infinite;}
+@keyframes slowspin{to{transform:rotate(360deg);}}
+.compass .c-center{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+}
+.compass .c-center img{width:96px;height:96px;object-fit:contain;}
+.top-meta{display:flex;justify-content:center;gap:22px;margin:6px 0 28px;font-size:12px;color:var(--tmuted);}
+.top-meta b{color:var(--ink);font-size:15px;display:block;text-align:center;font-family:'M PLUS Rounded 1c',sans-serif;}
+.btn-main{
+  display:block;width:100%;border:none;cursor:pointer;
+  background:linear-gradient(135deg,var(--or1),var(--or2));
+  color:#fff;font-family:inherit;font-weight:700;font-size:15px;
+  padding:16px;border-radius:99px;letter-spacing:.08em;
+  box-shadow:0 8px 20px rgba(212,120,90,.32);
+  transition:transform .15s,box-shadow .15s;
+}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(212,120,90,.4);}
+.btn-main:focus-visible{outline:3px solid var(--teal);outline-offset:3px;}
+.top-note{font-size:11px;color:var(--tmuted);text-align:center;margin-top:14px;}
+.top-types{margin-top:42px;border-top:1px solid var(--line);padding-top:26px;}
+.top-types h3{font-size:12px;letter-spacing:.2em;color:var(--tmuted);text-align:center;font-weight:500;margin-bottom:16px;}
+.type-strip{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+.type-chip{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:8px 12px;font-size:12px;display:flex;align-items:center;gap:6px;
+}
+.type-chip i{font-style:normal;font-size:16px;}
+
+/* ===== 質問画面 ===== */
+.q-head{padding:30px 0 6px;}
+.q-progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--tmuted);margin-bottom:8px;letter-spacing:.06em;}
+.q-bar{height:6px;background:rgba(58,51,48,.08);border-radius:99px;overflow:hidden;}
+.q-bar i{
+  display:block;height:100%;width:0%;
+  background:linear-gradient(90deg,var(--or1),var(--or2));
+  border-radius:99px;transition:width .4s ease;
+}
+.q-card{
+  background:var(--card);border:1px solid var(--line);border-radius:22px;
+  padding:38px 26px 32px;margin-top:26px;
+  box-shadow:0 6px 24px rgba(58,51,48,.05);
+  text-align:center;
+}
+.q-num{font-family:'M PLUS Rounded 1c',sans-serif;font-size:13px;color:var(--or2);letter-spacing:.18em;margin-bottom:14px;}
+.q-text{
+  font-family:'M PLUS Rounded 1c',sans-serif;font-size:18.5px;font-weight:600;
+  line-height:1.9;min-height:106px;display:flex;align-items:center;justify-content:center;
+}
+.likert{display:flex;align-items:center;justify-content:space-between;margin:34px 0 10px;gap:6px;}
+.lk{border-radius:50%;border:2.5px solid;cursor:pointer;background:transparent;transition:.18s;flex:none;padding:0;}
+.lk:nth-child(1){width:52px;height:52px;border-color:var(--teal);}
+.lk:nth-child(2){width:42px;height:42px;border-color:var(--teal);opacity:.85;}
+.lk:nth-child(3){width:32px;height:32px;border-color:rgba(58,51,48,.25);}
+.lk:nth-child(4){width:42px;height:42px;border-color:var(--or1);}
+.lk:nth-child(5){width:52px;height:52px;border-color:var(--or2);}
+.lk:hover{transform:scale(1.12);}
+.lk:focus-visible{outline:3px solid var(--ink);outline-offset:3px;}
+.lk.sel:nth-child(1),.lk.sel:nth-child(2){background:var(--teal);border-color:var(--teal);}
+.lk.sel:nth-child(3){background:rgba(58,51,48,.4);border-color:rgba(58,51,48,.4);}
+.lk.sel:nth-child(4),.lk.sel:nth-child(5){background:var(--or2);border-color:var(--or2);}
+.likert-labels{display:flex;justify-content:space-between;font-size:11.5px;font-weight:700;}
+.likert-labels span:first-child{color:var(--teal);}
+.likert-labels span:last-child{color:var(--or2);}
+.q-back{
+  margin-top:22px;background:none;border:none;color:var(--tmuted);
+  font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;
+}
+.q-back:disabled{opacity:.35;cursor:default;}
+
+/* ===== 結果画面 ===== */
+.r-hero{text-align:center;padding:44px 0 10px;}
+.r-eyebrow{font-size:11px;letter-spacing:.26em;color:var(--tmuted);margin-bottom:22px;}
+.r-badge{
+  width:168px;height:168px;margin:0 auto;border-radius:50%;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  background:radial-gradient(circle at 50% 38%,#FFF6EA,#FBE9D6 70%);
+  border:1.5px solid rgba(232,151,109,.45);
+  box-shadow:0 0 0 10px rgba(232,193,112,.14),0 0 0 22px rgba(232,193,112,.06),0 14px 30px rgba(212,120,90,.18);
+  animation:badgein .9s cubic-bezier(.2,.9,.3,1.2);
+}
+@keyframes badgein{from{transform:scale(.4);opacity:0;}to{transform:scale(1);opacity:1;}}
+.r-badge img{width:100%;height:100%;object-fit:cover;display:block;}
+.r-badge .acc{
+  position:absolute;top:4px;right:4px;font-size:28px;font-style:normal;
+  filter:drop-shadow(0 2px 4px rgba(58,51,48,.18));
+  animation:accin 1.2s ease;
+  z-index:1;
+}
+
+@keyframes accin{0%,55%{transform:scale(0);opacity:0;}80%{transform:scale(1.25);}100%{transform:scale(1);opacity:1;}}
+.r-typecode{margin-top:22px;font-size:12px;letter-spacing:.3em;color:var(--or2);font-weight:700;}
+.r-typename{font-family:'M PLUS Rounded 1c',sans-serif;font-size:27px;font-weight:700;margin-top:6px;letter-spacing:.04em;}
+.r-catch{font-size:13px;color:var(--tmuted);margin-top:10px;line-height:2;}
+.r-section{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px 24px;margin-top:20px;}
+.r-label{
+  font-size:11px;letter-spacing:.22em;color:var(--or2);font-weight:700;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.r-label::after{content:'';flex:1;height:1px;background:var(--line);}
+.r-body{font-size:13.5px;line-height:2.05;}
+.radar-wrap{display:flex;justify-content:center;padding:6px 0;}
+#radar-shape{transition:all 1s cubic-bezier(.2,.8,.3,1);}
+.axis{font-size:12px;}
+.axis-names{display:flex;justify-content:space-between;font-weight:700;margin-bottom:5px;}
+.axis-names .lw{color:var(--teal);}
+.axis-names .rw{color:var(--or2);}
+.axis-track{height:8px;border-radius:99px;background:rgba(58,51,48,.07);position:relative;}
+.axis-dot{
+  position:absolute;top:50%;width:18px;height:18px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:linear-gradient(135deg,var(--or1),var(--or2));
+  box-shadow:0 2px 8px rgba(212,120,90,.4);
+}
+.axis-pct{font-size:10.5px;color:var(--tmuted);margin-top:4px;text-align:right;}
+.vchips{display:flex;gap:8px;flex-wrap:wrap;}
+.vchip{
+  background:rgba(232,149,109,.1);border:1px solid rgba(232,149,109,.35);
+  color:var(--or2);font-weight:700;font-size:12.5px;border-radius:99px;padding:6px 14px;
+}
+.vchip.second{opacity:.72;}
+.r-cta{
+  margin-top:24px;background:linear-gradient(135deg,#4A3F3A,#3A3330);
+  border-radius:20px;padding:28px 24px;color:#fff;text-align:center;
+}
+.r-cta h3{font-family:'M PLUS Rounded 1c',sans-serif;font-size:17px;font-weight:600;line-height:1.8;}
+.r-cta p{font-size:12px;opacity:.75;margin:10px 0 18px;line-height:1.9;}
+.btn-cta{
+  display:inline-block;background:linear-gradient(135deg,var(--or1),var(--or2));
+  color:#fff;border:none;font-family:inherit;font-weight:700;font-size:13.5px;
+  padding:13px 30px;border-radius:99px;cursor:pointer;letter-spacing:.06em;
+  text-decoration:none;
+}
+.r-actions{display:flex;gap:10px;margin-top:18px;}
+.btn-sub{
+  flex:1;background:var(--card);border:1.5px solid rgba(232,149,109,.5);
+  color:var(--or2);font-family:inherit;font-weight:700;font-size:12.5px;
+  padding:12px 8px;border-radius:99px;cursor:pointer;transition:.15s;
+  text-align:center;text-decoration:none;display:block;
+}
+.btn-sub:hover{background:rgba(232,149,109,.08);}
+.r-disclaimer{font-size:10.5px;color:var(--tmuted);margin-top:18px;text-align:center;line-height:1.9;}
+.footer{font-size:10.5px;color:var(--tmuted);text-align:center;margin-top:40px;line-height:1.9;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== ① トップ ===== -->
+  <section class="screen active" id="scr-top">
+    <div class="top-hero">
+      <div class="top-eyebrow">CAREER TALENT TYPE</div>
+      <h1 class="top-title">はたらく<em>才能</em>診断</h1>
+      <p class="top-lead">30の質問に答えるだけで、あなたの「強みのかたち」と<br>「大切にしている価値観」が16タイプで見えてきます。</p>
+      <div class="compass">
+        <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="47" fill="none" stroke="rgba(232,149,109,.4)" stroke-width="1" stroke-dasharray="2 4"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(61,122,112,.3)" stroke-width="1"/>
+          <g stroke="rgba(58,51,48,.35)" stroke-width="1">
+            <line x1="50" y1="3" x2="50" y2="12"/><line x1="50" y1="88" x2="50" y2="97"/>
+            <line x1="3" y1="50" x2="12" y2="50"/><line x1="88" y1="50" x2="97" y2="50"/>
+          </g>
+        </svg>
+        <div class="c-center" aria-hidden="true"><img id="top-mascot" src="" alt="" width="96" height="96"></div>
+      </div>
+      <div class="top-meta">
+        <div><b>30問</b>質問数</div>
+        <div><b>約5分</b>所要時間</div>
+        <div><b>16タイプ</b>診断結果</div>
+      </div>
+      <button class="btn-main" onclick="startQuiz()">診断をはじめる</button>
+      <p class="top-note">無料・登録不要でご利用いただけます</p>
+    </div>
+    <div class="top-types">
+      <h3>— あなたはどのタイプ？ —</h3>
+      <div class="type-strip">
+        <div class="type-chip"><i>🏮</i>寄り添いの灯台守</div>
+        <div class="type-chip"><i>⛵</i>みんなの船長</div>
+        <div class="type-chip"><i>⚗️</i>ひらめきの錬金術師</div>
+        <div class="type-chip"><i>⛰️</i>孤高の登山家</div>
+      </div>
+    </div>
+    <p class="footer">本診断はキャリアアンカー理論（E.H.シャイン）を参考に独自開発したものです。<br>医学的・心理学的な検査ではなく、自己理解のきっかけとしてお楽しみください。</p>
+  </section>
+
+  <!-- ===== ② 質問 ===== -->
+  <section class="screen" id="scr-q">
+    <div class="q-head">
+      <div class="q-progress-label"><span id="q-count">Q1 / 30</span><span id="q-eta">あと約5分</span></div>
+      <div class="q-bar"><i id="q-fill"></i></div>
+    </div>
+    <div class="q-card">
+      <div class="q-num" id="q-num">Question 01</div>
+      <p class="q-text" id="q-text"></p>
+      <div class="likert" id="likert">
+        <button class="lk" onclick="pick(1)" aria-label="そう思わない"></button>
+        <button class="lk" onclick="pick(2)" aria-label="あまりそう思わない"></button>
+        <button class="lk" onclick="pick(3)" aria-label="どちらでもない"></button>
+        <button class="lk" onclick="pick(4)" aria-label="ややそう思う"></button>
+        <button class="lk" onclick="pick(5)" aria-label="そう思う"></button>
+      </div>
+      <div class="likert-labels"><span>そう思わない</span><span>そう思う</span></div>
+    </div>
+    <div style="text-align:center;">
+      <button class="q-back" id="q-back" onclick="goBack()">← 前の質問にもどる</button>
+    </div>
+  </section>
+
+  <!-- ===== ③ 結果 ===== -->
+  <section class="screen" id="scr-result">
+    <div class="r-hero">
+      <div class="r-eyebrow">YOUR TYPE</div>
+      <div class="r-badge"><img id="r-mascot" src="" alt="" width="168" height="168"><i class="acc" id="r-acc"></i></div>
+      <div class="r-typecode" id="r-code"></div>
+      <h2 class="r-typename serif" id="r-name"></h2>
+      <p class="r-catch" id="r-catch"></p>
+    </div>
+
+    <div class="r-section">
+      <div class="r-label">あなたという人</div>
+      <p class="r-body" id="r-desc"></p>
+    </div>
+
+    <div class="r-section">
+      <div class="r-label">強みのかたち</div>
+      <div class="radar-wrap">
+        <svg width="280" height="250" viewBox="0 0 280 250" aria-label="強みのレーダーチャート">
+          <g stroke="rgba(58,51,48,.12)" fill="none">
+            <polygon points="140,30 222.3,77.5 222.3,172.5 140,220 57.7,172.5 57.7,77.5"/>
+            <polygon points="140,61.7 194.8,93.3 194.8,156.7 140,188.3 85.2,156.7 85.2,93.3"/>
+            <polygon points="140,93.3 167.4,109.2 167.4,140.8 140,156.7 112.6,140.8 112.6,109.2"/>
+            <line x1="140" y1="125" x2="140" y2="30"/><line x1="140" y1="125" x2="222.3" y2="77.5"/>
+            <line x1="140" y1="125" x2="222.3" y2="172.5"/><line x1="140" y1="125" x2="140" y2="220"/>
+            <line x1="140" y1="125" x2="57.7" y2="172.5"/><line x1="140" y1="125" x2="57.7" y2="77.5"/>
+          </g>
+          <polygon id="radar-shape" points="140,125 140,125 140,125 140,125 140,125 140,125"
+            fill="rgba(232,149,109,.25)" stroke="#D4785A" stroke-width="2.5" stroke-linejoin="round"/>
+          <g font-size="11" font-weight="700" fill="#3A3330" text-anchor="middle" font-family="'M PLUS Rounded 1c',sans-serif">
+            <text x="140" y="20">共感</text>
+            <text x="241" y="74">分析</text>
+            <text x="241" y="184">実行</text>
+            <text x="140" y="240">創造</text>
+            <text x="39" y="184">調整</text>
+            <text x="39" y="74">学習</text>
+          </g>
+        </svg>
+      </div>
+      <p class="r-body" style="font-size:12.5px;color:var(--tmuted);" id="r-radar-note"></p>
+    </div>
+
+    <div class="r-section">
+      <div class="r-label">大切にしている価値観 TOP3</div>
+      <div class="vchips" id="r-values"></div>
+      <p class="r-body" style="margin-top:14px;" id="r-values-note"></p>
+    </div>
+
+    <div class="r-section">
+      <div class="r-label">エネルギーの源</div>
+      <div class="axis">
+        <div class="axis-names"><span class="lw">一人で深めて充電</span><span class="rw">人と関わって充電</span></div>
+        <div class="axis-track"><span class="axis-dot" id="r-energy-dot" style="left:50%;"></span></div>
+        <div class="axis-pct" id="r-energy-pct"></div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <div class="r-label">キャリアのヒント</div>
+      <p class="r-body" id="r-hint"></p>
+    </div>
+
+    <div class="r-cta">
+      <h3 class="serif">この結果、誰かと話してみませんか？</h3>
+      <p>国家資格キャリアコンサルタントとの面談で、<br>診断結果をあなたの「次の一歩」につなげられます。</p>
+      <a class="btn-cta" href="https://health-career.github.io/career-coaching/" target="_blank" rel="noopener">面談について見てみる</a>
+    </div>
+
+    <div class="r-actions">
+      <a class="btn-sub" id="r-share" href="#" target="_blank" rel="noopener">結果をXでシェア</a>
+      <button class="btn-sub" onclick="restart()">もう一度診断する</button>
+    </div>
+    <p class="r-disclaimer">本診断はキャリアアンカー理論を参考にした自己理解のためのエンタメコンテンツです。<br>結果はブラウザ内でのみ計算され、外部に送信されることはありません。</p>
+  </section>
+
+</div>
+
+<script>
+// ============================================================
+// 質問定義（30問）
+// a: 配点先の軸 / rev: 逆転項目（高いほど内向）
+// アンカー8軸: TF専門性 GM経営 AU自律 SE安定 EC創造 SV貢献 CH挑戦 LS調和
+// エネルギー: EN / 強み6軸: S_emp共感 S_ana分析 S_act実行 S_cre創造 S_coo調整 S_lea学習
+// ============================================================
+var QUESTIONS = [
+  {t:'自分の専門分野を極めることに、強いやりがいを感じる', a:'TF'},
+  {t:'相手の気持ちの変化に、すぐ気づくほうだ', a:'S_emp'},
+  {t:'組織やチーム全体を動かす立場に魅力を感じる', a:'GM'},
+  {t:'物事の原因や仕組みを考えるのが好きだ', a:'S_ana'},
+  {t:'仕事のやり方やペースは、自分で決めたい', a:'AU'},
+  {t:'人と話すことで、エネルギーが湧いてくる', a:'EN'},
+  {t:'将来の見通しが立つ、安定した環境で働きたい', a:'SE'},
+  {t:'思い立ったら、すぐ行動に移すほうだ', a:'S_act'},
+  {t:'自分のアイデアでゼロから何かを生み出したい', a:'EC'},
+  {t:'新しいアイデアや企画を思いつくのが得意だ', a:'S_cre'},
+  {t:'誰かの役に立てている実感が、何よりのモチベーションになる', a:'SV'},
+  {t:'立場や意見の違う人たちの間を取り持つのが得意だ', a:'S_coo'},
+  {t:'難しい課題ほど、かえって燃えるタイプだ', a:'CH'},
+  {t:'新しい知識やスキルを学ぶこと自体が楽しい', a:'S_lea'},
+  {t:'仕事と私生活の調和が、キャリア選択でいちばん大切だ', a:'LS'},
+  {t:'管理職になるよりも、専門家として頼られる存在でいたい', a:'TF'},
+  {t:'人から相談を受けることが多い', a:'S_emp'},
+  {t:'人やチームをまとめて成果を出すことにやりがいを感じる', a:'GM'},
+  {t:'データや根拠をもとに判断するほうだ', a:'S_ana'},
+  {t:'細かいルールや指示に縛られると、窮屈に感じる', a:'AU'},
+  {t:'大人数の場よりも、一人や少人数の時間で充電するほうだ', a:'EN', rev:true},
+  {t:'大きな変化よりも、確実で計画的なキャリアを好む', a:'SE'},
+  {t:'一度決めたことは、最後までやり遂げるほうだ', a:'S_act'},
+  {t:'いつか自分の事業やサービスを持ちたいと思うことがある', a:'EC'},
+  {t:'いつものやり方にも、つい工夫を加えたくなる', a:'S_cre'},
+  {t:'社会や身近な人を、より良くする仕事に携わりたい', a:'SV'},
+  {t:'チームの雰囲気づくりを、自然と担っていることが多い', a:'S_coo'},
+  {t:'「難しい」「無理だ」と言われると、逆にやってみたくなる', a:'CH'},
+  {t:'興味を持ったことは、とことん調べてしまう', a:'S_lea'},
+  {t:'収入や肩書きよりも、自分らしい生活リズムを優先したい', a:'LS'}
+];
+
+// ============================================================
+// アンカー定義（価値観表示用）
+// ============================================================
+var ANCHORS = {
+  TF:{label:'専門性',     emoji:'🛠️', note:'専門性を磨き、その道のプロとして頼られることが、あなたのエネルギーの源です。'},
+  GM:{label:'経営・統率', emoji:'⛵', note:'人や組織を動かして大きな成果を生み出すことが、あなたのエネルギーの源です。'},
+  AU:{label:'自律・独立', emoji:'🧭', note:'自分のやり方とペースで仕事を組み立てられることが、あなたのエネルギーの源です。'},
+  SE:{label:'安定',       emoji:'🗝️', note:'見通しの立つ環境で安心して力を発揮できることが、あなたのエネルギーの源です。'},
+  EC:{label:'創造',       emoji:'💡', note:'ゼロから新しいものを生み出すことが、あなたのエネルギーの源です。'},
+  SV:{label:'貢献',       emoji:'🤝', note:'人や社会の役に立っている実感が、あなたのエネルギーの源です。'},
+  CH:{label:'挑戦',       emoji:'🚩', note:'困難な課題を乗り越えていくことが、あなたのエネルギーの源です。'},
+  LS:{label:'調和',       emoji:'🌿', note:'仕事と人生のバランスがとれていることが、あなたのエネルギーの源です。'}
+};
+var ANCHOR_ORDER = ['TF','GM','AU','SE','EC','SV','CH','LS'];
+
+// ============================================================
+// 16タイプ定義（アンカー × E外向/I内向）
+// ============================================================
+var TYPES = {
+  'TF-E':{name:'技を伝える名匠', acc:'🔨', color:'#C97B4A',
+    catch:'磨いた技は、分かち合ってこそ輝く。<br>あなたの知恵を待っている人がいます。',
+    desc:'専門性を深めながら、それを人に伝えることに喜びを感じるタイプ。後輩の指導や勉強会など「教える場」で、あなたの価値は倍増します。周囲からは「あの人に聞けば間違いない」と頼られる存在でしょう。',
+    hint:'専門を深める学びと、発信・指導の機会をセットで設計すると、キャリアの満足度がぐっと高まります。'},
+  'TF-I':{name:'静かなる職人', acc:'⚒️', color:'#C97B4A',
+    catch:'誰が見ていなくても、手を抜かない。<br>その積み重ねが、あなたの誇りです。',
+    desc:'一つの道を黙々と究めていく求道者タイプ。流行に流されず、本質的な技術や知識を大切にします。表舞台に立つよりも、確かな仕事そのもので信頼を築いていくでしょう。',
+    hint:'専門性が正当に評価される環境かどうかが満足度の鍵。評価軸の合わない場所では消耗しやすいので、環境選びは慎重に。'},
+  'GM-E':{name:'みんなの船長', acc:'⛵', color:'#4A6FA5',
+    catch:'目的地を指さし、仲間を鼓舞する。<br>チームはあなたの声で動き出します。',
+    desc:'人を巻き込みながら組織を前に進めることに、自然な喜びを感じるタイプ。視野が広く、全体最適で物事を考えられます。気づけばリーダー役を任されていることも多いはず。',
+    hint:'プレイヤーとしての成果だけでなく、マネジメント経験を早めに積み重ねることが、キャリアの追い風になります。'},
+  'GM-I':{name:'戦略の参謀', acc:'♟️', color:'#4A6FA5',
+    catch:'一歩引いて全体を見渡し、最善の一手を考える。<br>静かな頭脳が、組織を支えます。',
+    desc:'前に立つよりも、構造や仕組みから組織を動かすタイプ。観察力と分析力を併せ持ち、的確な判断を下せます。トップの右腕や企画ポジションで力を発揮するでしょう。',
+    hint:'「目立つリーダー」だけがマネジメントではありません。参謀型の強みが活きる役割を、意識的に選んでいきましょう。'},
+  'AU-E':{name:'自由な旅人', acc:'🎒', color:'#3D7A70',
+    catch:'決まったレールより、自分で描く地図を。<br>出会いを楽しみながら、わが道を行く。',
+    desc:'自由と人とのつながり、その両方を大切にするタイプ。組織に縛られすぎず、プロジェクト単位や複業的な働き方にフィットします。フットワークの軽さが最大の武器です。',
+    hint:'裁量の大きさはあなたの生命線。職場選びでは「何をするか」と同じくらい「どう働けるか」を確認しましょう。'},
+  'AU-I':{name:'孤高の航海士', acc:'🧭', color:'#3D7A70',
+    catch:'自分の羅針盤を信じて、静かな海を進む。<br>誰かの正解より、自分の納得を。',
+    desc:'自分のペースと判断軸を何より大切にするタイプ。一人で深く考え、納得してから動きます。専門職やリモートワークなど、裁量と静けさのある環境で力を発揮します。',
+    hint:'「周囲に合わせること」に使うエネルギーを最小化できる環境設計が、長く活躍するための鍵になります。'},
+  'SE-E':{name:'みんなの安全基地', acc:'🏡', color:'#8A9A5B',
+    catch:'あなたがいると、なぜかほっとする。<br>安心感は、立派な才能です。',
+    desc:'安定した土台の上で、人とのつながりを育むタイプ。変化の激しい環境よりも、腰を据えて信頼関係を積み上げる働き方が向いています。職場の精神的な支柱になっていることも。',
+    hint:'安定志向は弱みではなく戦略です。ただし環境変化への備えとして、持ち運べるスキルも少しずつ育てておくと安心です。'},
+  'SE-I':{name:'堅実な番人', acc:'🗝️', color:'#8A9A5B',
+    catch:'派手さはいらない。確かなものを、確かに守る。<br>その誠実さが、信頼を生みます。',
+    desc:'コツコツと確実に物事を進める、信頼の人。リスク管理や品質保証など「間違いが許されない仕事」で輝きます。計画性と慎重さは、組織にとって欠かせない財産です。',
+    hint:'慎重さゆえにチャンスを見送りがち。「小さく試す」を合言葉に、低リスクの挑戦を生活に混ぜてみましょう。'},
+  'EC-E':{name:'情熱の発明家', acc:'💡', color:'#D4785A',
+    catch:'思いついたら、誰かに話さずにいられない。<br>あなたの熱は、人を動かします。',
+    desc:'アイデアと行動力、そして巻き込み力を併せ持つ起業家タイプ。ゼロイチの場面でこそ本領を発揮します。新規事業や立ち上げフェーズに身を置くと、生き生きと働けるでしょう。',
+    hint:'発散したアイデアを「カタチにする仕組み」や相棒を持つと、構想がぐっと実を結びやすくなります。'},
+  'EC-I':{name:'ひらめきの錬金術師', acc:'⚗️', color:'#D4785A',
+    catch:'静かな実験室で、誰も見たことのないものを。<br>深い思索が、あなたの原料です。',
+    desc:'一人で深く考え、独自の発想を練り上げる創造者タイプ。流行をなぞるのではなく、本質から新しいものを生み出します。研究開発・企画・ものづくりの領域と相性抜群です。',
+    hint:'構想を温めすぎて出しそびれることも。「未完成でも一度世に出す」勇気が、創造のサイクルを回します。'},
+  'SV-E':{name:'寄り添いの灯台守', acc:'🏮', color:'#D96A6A',
+    catch:'人の心の機微に気づき、あたたかく照らす。<br>あなたの灯りを頼りに、誰かが前に進みます。',
+    desc:'人の役に立つことと、人と関わること。その両方からエネルギーを得るタイプです。支援職・対人職の適性が高く、相手の変化や成長が何よりの報酬になります。',
+    hint:'与えすぎて自分が枯れないように。あなた自身をケアする時間も「仕事の一部」と考えてください。'},
+  'SV-I':{name:'ひだまりの守り人', acc:'🌿', color:'#D96A6A',
+    catch:'目立たない場所で、そっと誰かを支える。<br>その優しさに、救われている人がいます。',
+    desc:'静かに、しかし確かに人を支えるタイプ。大勢の前に立つよりも、一対一の深い関わりや縁の下の支援で力を発揮します。観察力と思いやりが、あなたの武器です。',
+    hint:'貢献が「見えにくい」ポジションだと評価されづらいことも。自分の貢献を言葉にして残す習慣を持ちましょう。'},
+  'CH-E':{name:'冒険の旗振り役', acc:'🚩', color:'#B05A7A',
+    catch:'困難な山ほど、登りたくなる。<br>あなたの背中が、仲間の勇気になります。',
+    desc:'高い目標と、仲間との挑戦が大好物のチャレンジャー。現状維持の環境では退屈してしまいます。変革期のプロジェクトや難易度の高いミッションで、真価を発揮するでしょう。',
+    hint:'挑戦の合間に「回復期間」を意図的に設けると、燃え尽きずに長く走り続けられます。'},
+  'CH-I':{name:'孤高の登山家', acc:'⛰️', color:'#B05A7A',
+    catch:'他人との競争より、昨日の自分との勝負。<br>静かに、しかし確実に頂を目指す。',
+    desc:'自分自身に課したハードルを、黙々と越えていくタイプ。難関資格や高度な専門領域など「個人戦の挑戦」と相性が良いでしょう。内なる向上心が尽きることはありません。',
+    hint:'高すぎる自己基準で自分を責めないこと。「ここまでできた」を数える振り返りを習慣にしましょう。'},
+  'LS-E':{name:'暮らしの楽団長', acc:'🎻', color:'#C9A227',
+    catch:'仕事も、家族も、遊びも。<br>ぜんぶ合奏してこそ、人生のいい音が鳴る。',
+    desc:'人生のあらゆる場面を大切にし、人とのつながりの中でバランスを取るタイプ。柔軟な働き方と豊かな私生活の両立が、結果的に仕事のパフォーマンスも引き上げます。',
+    hint:'「全部大事」は強みですが、時期によって主旋律を決めると、無理なく調和が保てます。'},
+  'LS-I':{name:'マイペースな庭師', acc:'🪴', color:'#C9A227',
+    catch:'焦らず、比べず、自分の庭を育てる。<br>あなたのペースが、いちばんの肥料です。',
+    desc:'自分らしい生活のリズムを守りながら、着実に人生を育てていくタイプ。世間の「普通」や出世競争とは距離を置き、自分の納得感を軸に選択できます。',
+    hint:'マイペースは才能。ただしキャリアの節目では、信頼できる人に壁打ちすると視野が広がります。'}
+};
+
+// ============================================================
+// 状態管理
+// ============================================================
+var qi = 0;
+var answers = [];
+
+function show(name){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('scr-' + name).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startQuiz(){
+  qi = 0;
+  answers = [];
+  renderQ();
+  show('q');
+}
+
+function renderQ(){
+  var q = QUESTIONS[qi];
+  document.getElementById('q-text').textContent = q.t;
+  document.getElementById('q-num').textContent = 'Question ' + String(qi + 1).padStart(2,'0');
+  document.getElementById('q-count').textContent = 'Q' + (qi + 1) + ' / ' + QUESTIONS.length;
+  var remainMin = Math.max(1, Math.ceil((QUESTIONS.length - qi) * 10 / 60));
+  document.getElementById('q-eta').textContent = 'あと約' + remainMin + '分';
+  document.getElementById('q-fill').style.width = (qi / QUESTIONS.length * 100) + '%';
+  document.getElementById('q-back').disabled = (qi === 0);
+  var btns = document.querySelectorAll('.lk');
+  btns.forEach(function(b, idx){
+    b.classList.toggle('sel', answers[qi] === idx + 1);
+  });
+}
+
+var picking = false;
+function pick(val){
+  if(picking) return;
+  picking = true;
+  answers[qi] = val;
+  var btns = document.querySelectorAll('.lk');
+  btns.forEach(function(b, idx){
+    b.classList.toggle('sel', idx + 1 === val);
+  });
+  setTimeout(function(){
+    picking = false;
+    if(qi < QUESTIONS.length - 1){
+      qi++;
+      renderQ();
+    } else {
+      showResult();
+    }
+  }, 280);
+}
+
+function goBack(){
+  if(qi > 0){
+    qi--;
+    renderQ();
+  }
+}
+
+function restart(){
+  show('top');
+}
+
+// ============================================================
+// 採点・結果表示
+// ============================================================
+function computeScores(){
+  var scores = {};
+  QUESTIONS.forEach(function(q, i){
+    var v = answers[i] || 3;
+    if(q.rev){ v = 6 - v; }
+    scores[q.a] = (scores[q.a] || 0) + v;
+  });
+  return scores;
+}
+
+function showResult(){
+  var s = computeScores();
+
+  // タイプ判定：最高得点のアンカー（同点は定義順で先のもの）
+  var topAnchor = ANCHOR_ORDER[0];
+  ANCHOR_ORDER.forEach(function(a){
+    if((s[a] || 0) > (s[topAnchor] || 0)){ topAnchor = a; }
+  });
+  var energy = s['EN'] || 6;            // 2〜10（高いほど外向）
+  var mood = (energy >= 6) ? 'E' : 'I';
+  var typeKey = topAnchor + '-' + mood;
+  var T = TYPES[typeKey];
+
+  // キャラクター画像
+  var mascot = document.getElementById('r-mascot');
+  mascot.src = 'images/' + typeKey + '.png';
+  mascot.alt = T.name;
+  document.getElementById('r-acc').textContent = T.acc;
+  document.getElementById('r-code').textContent = 'TYPE — ' + topAnchor + ' × ' + (mood === 'E' ? '外向' : '内向');
+  document.getElementById('r-name').textContent = T.name;
+  document.getElementById('r-catch').innerHTML = T.catch;
+  document.getElementById('r-desc').textContent = T.desc;
+  document.getElementById('r-hint').textContent = T.hint;
+
+  // レーダーチャート（強み6軸：各2〜10点）
+  var strengthKeys = ['S_emp','S_ana','S_act','S_cre','S_coo','S_lea'];
+  var strengthNames = ['共感','分析','実行','創造','調整','学習'];
+  var cx = 140, cy = 125, maxR = 95;
+  var pts = strengthKeys.map(function(k, idx){
+    var frac = ((s[k] || 2) - 2) / 8;
+    var r = 16 + frac * (maxR - 16);
+    var theta = (-90 + idx * 60) * Math.PI / 180;
+    return (cx + r * Math.cos(theta)).toFixed(1) + ',' + (cy + r * Math.sin(theta)).toFixed(1);
+  });
+  setTimeout(function(){
+    document.getElementById('radar-shape').setAttribute('points', pts.join(' '));
+  }, 350);
+
+  // 強みTOP2のコメント
+  var ranked = strengthKeys.map(function(k, idx){ return {n: strengthNames[idx], v: s[k] || 0}; })
+                           .sort(function(a, b){ return b.v - a.v; });
+  document.getElementById('r-radar-note').textContent =
+    '特に高いのは「' + ranked[0].n + '」と「' + ranked[1].n + '」。この2つが重なる場面で、あなたの強みは最も輝きます。';
+
+  // 価値観TOP3（アンカー上位3つ）
+  var rankedAnchors = ANCHOR_ORDER.map(function(a){ return {key: a, v: s[a] || 0}; })
+                                  .sort(function(a, b){ return b.v - a.v; })
+                                  .slice(0, 3);
+  var chipsHtml = rankedAnchors.map(function(r, idx){
+    var A = ANCHORS[r.key];
+    return '<span class="vchip' + (idx > 0 ? ' second' : '') + '">' + A.emoji + ' ' + A.label + '</span>';
+  }).join('');
+  document.getElementById('r-values').innerHTML = chipsHtml;
+  document.getElementById('r-values-note').textContent = ANCHORS[rankedAnchors[0].key].note;
+
+  // エネルギーバー（2〜10 → 0〜100%）
+  var ePct = Math.round((energy - 2) / 8 * 100);
+  document.getElementById('r-energy-dot').style.left = ePct + '%';
+  document.getElementById('r-energy-pct').textContent =
+    (mood === 'E' ? '人と関わって充電 ' + ePct + '%' : '一人で深めて充電 ' + (100 - ePct) + '%');
+
+  // Xシェアリンク
+  var shareText = '私のキャリアタイプは「' + T.name + '」でした！%0A%23はたらく才能診断%0A';
+  document.getElementById('r-share').href =
+    'https://twitter.com/intent/tweet?text=' + shareText + encodeURIComponent(location.href);
+
+  show('result');
+}
+
+// トップ画面のキャラクター（代表：寄り添いの灯台守）
+var topMascot = document.getElementById('top-mascot');
+topMascot.src = 'images/SV-E.png';
+topMascot.alt = '寄り添いの灯台守';
+</script>
+</body>
+</html>
